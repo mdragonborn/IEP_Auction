@@ -64,13 +64,13 @@ namespace IEP_Auction.Controllers
                 : "";
 
             var userId = User.Identity.GetUserId();
+            var user = UserManager.FindById(userId);
             var model = new IndexViewModel
             {
-                HasPassword = HasPassword(),
-                PhoneNumber = await UserManager.GetPhoneNumberAsync(userId),
-                TwoFactor = await UserManager.GetTwoFactorEnabledAsync(userId),
-                Logins = await UserManager.GetLoginsAsync(userId),
-                BrowserRemembered = await AuthenticationManager.TwoFactorBrowserRememberedAsync(userId)
+                Email = await UserManager.GetEmailAsync(userId),
+                FirstName = user.FirstName,
+                LastName = user.LastName
+                // TODO view tokens
             };
             return View(model);
         }
@@ -221,6 +221,20 @@ namespace IEP_Auction.Controllers
         }
 
         //
+        // GET: /Manage/ChangeUserInfo
+        public ActionResult ChangeUserInfo()
+        {
+            
+            var user = UserManager.FindById(User.Identity.GetUserId());
+            var model = new ChangeUserInfoModel {
+                FirstName = user.FirstName,
+                Email = user.Email,
+                LastName = user.LastName
+            };
+            return View(model);
+        }
+
+        //
         // POST: /Manage/ChangePassword
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -242,6 +256,25 @@ namespace IEP_Auction.Controllers
             }
             AddErrors(result);
             return View(model);
+        }
+
+        //
+        // POST: /Manage/ChangeUserInfo
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult ChangeUserInfo(ChangeUserInfoModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+            var user = UserManager.FindById(User.Identity.GetUserId());
+            user.FirstName = model.FirstName;
+            user.LastName = model.LastName;
+            user.Email = model.Email;
+
+            UserManager.Update(user);
+            return RedirectToAction("Index", new { Message = "Information updated successfully" });
         }
 
         //
