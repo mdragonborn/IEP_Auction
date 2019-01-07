@@ -3,7 +3,7 @@ USE IepDb;
 CREATE TABLE dbo.Bid
 (
 	Id bigint IDENTITY(1,1) PRIMARY KEY NOT NULL,
-	Time timestamp NOT NULL,
+	Time datetime NOT NULL,
 	Amount int,
 	UserId nvarchar(128) NOT NULL,
 	FOREIGN KEY(UserId) REFERENCES dbo.AspNetUsers(Id)
@@ -13,9 +13,12 @@ CREATE TABLE dbo.Auction
 	(Id uniqueidentifier PRIMARY KEY NOT NULL,
 	CreatorId nvarchar(128) NOT NULL,
 	Status nvarchar(10) NOT NULL DEFAULT 'OPENED',
-	TimeStart timestamp NOT NULL,
-	TimeEnd time NOT NULL,
+	TimeStart datetime NOT NULL,
+	TimeEnd datetime NOT NULL,
 	LastBidId bigint,
+	Name nvarchar(128) NOT NULL,
+	Description text NOT NULL,
+	ImagePath nvarchar(256) NOT NULL,
 	FOREIGN KEY(CreatorId) REFERENCES dbo.AspNetUsers(Id),
 	FOREIGN KEY(LastBidId) REFERENCES Bid(Id));
 
@@ -50,7 +53,7 @@ CREATE TABLE dbo.TokenOrders
 	Status nvarchar(10),
 	UserId nvarchar(128) NOT NULL,
 	Amount bigint NOT NULL,
-	Time timestamp NOT NULL,
+	Time datetime NOT NULL,
 	FOREIGN KEY(UserId) REFERENCES dbo.AspNetUsers(Id)
 )
 

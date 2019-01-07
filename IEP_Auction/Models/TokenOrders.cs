@@ -6,7 +6,7 @@ namespace IEP_Auction.Models
     using System.ComponentModel.DataAnnotations.Schema;
     using System.Data.Entity.Spatial;
 
-    public partial class TokenOrder
+    public partial class TokenOrders
     {
         public Guid Id { get; set; }
 
@@ -19,9 +19,6 @@ namespace IEP_Auction.Models
 
         public long Amount { get; set; }
 
-        [Column(TypeName = "timestamp")]
-        [MaxLength(8)]
-        [Timestamp]
-        public byte[] Time { get; set; }
+        public DateTime Time { get; set; }
     }
 }
