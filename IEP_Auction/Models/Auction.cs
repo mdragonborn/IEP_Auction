@@ -43,6 +43,8 @@ namespace IEP_Auction.Models
         [StringLength(256)]
         public string ImagePath { get; set; }
 
+        public virtual AspNetUsers AspNetUsers { get; set; }
+
         public virtual Bid Bid { get; set; }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]

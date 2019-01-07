@@ -26,6 +26,8 @@ namespace IEP_Auction.Models
         [StringLength(128)]
         public string UserId { get; set; }
 
+        public virtual AspNetUsers AspNetUsers { get; set; }
+
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Auction> Auction { get; set; }
 

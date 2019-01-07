@@ -1,9 +1,26 @@
-﻿@model IEnumerable<IEP_Auction.Models.Auction>
+﻿@model IEnumerable<IEP_Auction.Models.JoinedAuctionUsers>
 
 @{
     ViewBag.Title = "Index";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
+<span id="timerLabel" runat="server"></span>
+
+<script type="text/javascript">
+
+    function countdown()
+    {
+        seconds = document.getElementById("timerLabel").innerHTML;
+        if (seconds > 0)
+        {
+            document.getElementById("timerLabel").innerHTML = seconds - 1;
+            setTimeout("countdown()", 1000);
+        }
+    }
+
+    setTimeout("countdown()", 1000);
+
+</script>
 
 <h2>Index</h2>
 
@@ -13,28 +30,28 @@
 <table class="table">
     <tr>
         <th>
-            @Html.DisplayNameFor(model => model.Bid.UserId)
+            @Html.DisplayNameFor(model => model.Auction.Name)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.CreatorId)
+            @Html.DisplayNameFor(model => model.Auction.Description)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.Status)
+            @Html.DisplayNameFor(model => model.Auction.ImagePath)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.TimeStart)
+            @Html.DisplayNameFor(model => model.Auction.Status)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.TimeEnd)
+            Time left
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.Name)
+            User
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.Description)
+            @Html.DisplayNameFor(model => model.Auction.TimeStart)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.ImagePath)
+            @Html.DisplayNameFor(model => model.Auction.TimeEnd)
         </th>
         <th></th>
     </tr>
@@ -42,33 +59,41 @@
 @foreach (var item in Model) {
     <tr>
         <td>
-            @Html.DisplayFor(modelItem => item.Bid.UserId)
+            @Html.DisplayFor(modelItem => item.Auction.Name)
         </td>
         <td>
-            @Html.DisplayFor(modelItem => item.CreatorId)
+            @Html.DisplayFor(modelItem => item.Auction.Description)
         </td>
         <td>
-            @Html.DisplayFor(modelItem => item.Status)
+            <img src=@Html.DisplayFor(modelItem => item.Auction.ImagePath) height="140">
         </td>
         <td>
-            @Html.DisplayFor(modelItem => item.TimeStart)
+            @Html.DisplayFor(modelItem => item.Auction.Status)
         </td>
         <td>
-            @Html.DisplayFor(modelItem => item.TimeEnd)
+            @(DateTime.Now - item.Auction.TimeStart)
         </td>
         <td>
-            @Html.DisplayFor(modelItem => item.Name)
+            @Html.DisplayFor(modelItem => item.Email)
         </td>
         <td>
-            @Html.DisplayFor(modelItem => item.Description)
+            @Html.DisplayFor(modelItem => item.Auction.TimeStart)
         </td>
         <td>
-            @Html.DisplayFor(modelItem => item.ImagePath)
+            @Html.DisplayFor(modelItem => item.Auction.TimeEnd)
         </td>
         <td>
-            @Html.ActionLink("Edit", "Edit", new { id=item.Id }) |
-            @Html.ActionLink("Details", "Details", new { id=item.Id }) |
-            @Html.ActionLink("Delete", "Delete", new { id=item.Id })
+            @Html.ActionLink("Details", "Details", new { id=item.Auction.Id })
+            @if (Request.IsAuthenticated)
+
+            {
+                if (User.IsInRole("Admin") || ViewBag.UserId == (item.Auction.CreatorId))
+                {
+                    @Html.ActionLink("Edit", "Edit", new { id = item.Auction.Id });<br />
+                    @Html.ActionLink("Delete", "Delete", new { id = item.Auction.Id });
+                }
+            }
+            
         </td>
     </tr>
 }

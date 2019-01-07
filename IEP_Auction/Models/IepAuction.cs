@@ -12,6 +12,10 @@ namespace IEP_Auction.Models
         {
         }
 
+        public virtual DbSet<AspNetRoles> AspNetRoles { get; set; }
+        public virtual DbSet<AspNetUserClaims> AspNetUserClaims { get; set; }
+        public virtual DbSet<AspNetUserLogins> AspNetUserLogins { get; set; }
+        public virtual DbSet<AspNetUsers> AspNetUsers { get; set; }
         public virtual DbSet<Auction> Auction { get; set; }
         public virtual DbSet<Balance> Balance { get; set; }
         public virtual DbSet<Bid> Bid { get; set; }
@@ -21,6 +25,49 @@ namespace IEP_Auction.Models
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<AspNetRoles>()
+                .HasMany(e => e.AspNetUsers)
+                .WithMany(e => e.AspNetRoles)
+                .Map(m => m.ToTable("AspNetUserRoles").MapLeftKey("RoleId").MapRightKey("UserId"));
+
+            modelBuilder.Entity<AspNetUsers>()
+                .HasMany(e => e.AspNetUserClaims)
+                .WithRequired(e => e.AspNetUsers)
+                .HasForeignKey(e => e.UserId);
+
+            modelBuilder.Entity<AspNetUsers>()
+                .HasMany(e => e.AspNetUserLogins)
+                .WithRequired(e => e.AspNetUsers)
+                .HasForeignKey(e => e.UserId);
+
+            modelBuilder.Entity<AspNetUsers>()
+                .HasMany(e => e.Auction)
+                .WithRequired(e => e.AspNetUsers)
+                .HasForeignKey(e => e.CreatorId)
+                .WillCascadeOnDelete(false);
+
+            modelBuilder.Entity<AspNetUsers>()
+                .HasOptional(e => e.Balance)
+                .WithRequired(e => e.AspNetUsers);
+
+            modelBuilder.Entity<AspNetUsers>()
+                .HasMany(e => e.Bid)
+                .WithRequired(e => e.AspNetUsers)
+                .HasForeignKey(e => e.UserId)
+                .WillCascadeOnDelete(false);
+
+            modelBuilder.Entity<AspNetUsers>()
+                .HasMany(e => e.Reservation)
+                .WithRequired(e => e.AspNetUsers)
+                .HasForeignKey(e => e.UserId)
+                .WillCascadeOnDelete(false);
+
+            modelBuilder.Entity<AspNetUsers>()
+                .HasMany(e => e.TokenOrders)
+                .WithRequired(e => e.AspNetUsers)
+                .HasForeignKey(e => e.UserId)
+                .WillCascadeOnDelete(false);
+
             modelBuilder.Entity<Auction>()
                 .Property(e => e.Description)
                 .IsUnicode(false);

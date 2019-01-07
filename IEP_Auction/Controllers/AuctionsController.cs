@@ -16,12 +16,20 @@ namespace IEP_Auction.Views
     public class AuctionsController : Controller
     {
         private IepAuction db = new IepAuction();
+        private ApplicationDbContext adb = new ApplicationDbContext();
 
         // GET: Auctions
         public ActionResult Index()
         {
             var auction = db.Auction.Include(a => a.Bid);
-            return View(auction.ToList());
+            var users = db.Users;
+            IQueryable<JoinedAuctionUsers> join = auction.Join(users, x => x.CreatorId, y => y.Id,
+                (a, u) => new JoinedAuctionUsers
+                {
+                    Auction = a,
+                    Email = u.Email
+                });
+            return View(join.AsEnumerable());
         }
 
         // GET: Auctions/Details/5

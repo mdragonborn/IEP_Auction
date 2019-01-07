@@ -25,6 +25,11 @@ namespace IEP_Auction.Models
 
         // public virtual DbSet<MyEntity> MyEntities { get; set; }
     }
+    public class JoinedAuctionUsers
+    {
+        public Auction Auction { get; set; }
+        public string Email { get; set; }
+    }
 
     public class CreateAuctionModel
     {

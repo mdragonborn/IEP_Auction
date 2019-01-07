@@ -6,20 +6,19 @@ namespace IEP_Auction.Models
     using System.ComponentModel.DataAnnotations.Schema;
     using System.Data.Entity.Spatial;
 
-    public partial class TokenOrders
+    public partial class AspNetUserLogins
     {
-        public Guid Id { get; set; }
+        [Key]
+        [Column(Order = 0)]
+        public string LoginProvider { get; set; }
 
-        [StringLength(10)]
-        public string Status { get; set; }
+        [Key]
+        [Column(Order = 1)]
+        public string ProviderKey { get; set; }
 
-        [Required]
-        [StringLength(128)]
+        [Key]
+        [Column(Order = 2)]
         public string UserId { get; set; }
-
-        public long Amount { get; set; }
-
-        public DateTime Time { get; set; }
 
         public virtual AspNetUsers AspNetUsers { get; set; }
     }
