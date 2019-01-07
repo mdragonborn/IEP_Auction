@@ -16,20 +16,12 @@ namespace IEP_Auction.Views
     public class AuctionsController : Controller
     {
         private IepAuction db = new IepAuction();
-        private ApplicationDbContext adb = new ApplicationDbContext();
 
         // GET: Auctions
         public ActionResult Index()
         {
             var auction = db.Auction.Include(a => a.Bid);
-            var users = db.Users;
-            IQueryable<JoinedAuctionUsers> join = auction.Join(users, x => x.CreatorId, y => y.Id,
-                (a, u) => new JoinedAuctionUsers
-                {
-                    Auction = a,
-                    Email = u.Email
-                });
-            return View(join.AsEnumerable());
+            return View(auction.ToList());
         }
 
         // GET: Auctions/Details/5
@@ -66,7 +58,7 @@ namespace IEP_Auction.Views
                 var file = auctionData.File;
                 var id = Guid.NewGuid();
                 var imgPath = "/auctionItems/" + id + file.FileName;
-                file.SaveAs(Server.MapPath("~"+imgPath));
+                file.SaveAs(Server.MapPath("~" + imgPath));
 
                 var auction = new Auction
                 {
@@ -82,7 +74,7 @@ namespace IEP_Auction.Views
                 };
 
                 var initBid = new Bid
-                { 
+                {
                     Time = auction.TimeStart,
                     Amount = auctionData.InitialPrice,
                     UserId = User.Identity.GetUserId()
@@ -92,15 +84,16 @@ namespace IEP_Auction.Views
                     db.Auction.Add(auction);
                     db.Bid.Add(initBid);
                     db.SaveChanges();
-                } catch(System.Data.Entity.Validation.DbEntityValidationException e)
+                }
+                catch (System.Data.Entity.Validation.DbEntityValidationException e)
                 {
                     string msg = "";
                     foreach (var eve in e.EntityValidationErrors)
                     {
-                        msg+= eve.Entry.Entity.GetType().Name + eve.Entry.State + "\n";
+                        msg += eve.Entry.Entity.GetType().Name + eve.Entry.State + "\n";
                         foreach (var ve in eve.ValidationErrors)
                         {
-                            msg += ve.PropertyName + ve.ErrorMessage+"\n";
+                            msg += ve.PropertyName + ve.ErrorMessage + "\n";
                         }
                     }
                     ViewBag.errmsg = msg;
