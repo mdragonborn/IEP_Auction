@@ -28,8 +28,8 @@
         @Html.ValidationSummary(true, "", new { @class = "text-danger" })
         @Html.HiddenFor(model => model.Id, new { id = "hiddenModelId"})
 
-        @if (User.IsInRole("Admin")){
-            <input type="button" value="Create" onclick="Start()"/>
+        @if (User.IsInRole("Admin") && Model.Status=="READY"){
+            <input type="button" value="Start auction" onclick="Start()"/>
         }
 
         <div class="form-group">

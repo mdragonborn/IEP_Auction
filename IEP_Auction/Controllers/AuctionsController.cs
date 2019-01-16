@@ -65,18 +65,38 @@ namespace IEP_Auction.Views
                     Id = id,
                     CreatorId = User.Identity.GetUserId(),
                     DurationMinutes = (int)auctionData.AuctionLength.TotalMinutes,
-                    Status = "OPENED",
                     LastBidId = null,
+                    Status = "READY",
                     Name = auctionData.Name,
                     Description = auctionData.Description,
                     ImagePath = imgPath
                 };
 
+                var initBid = new Bid
+                {
+                    Time = DateTime.Now,
+                    Amount = auctionData.InitialPrice,
+                    UserId = User.Identity.GetUserId()
+                };
                 try
                 {
                     db.Auctions.Add(auction);
+                    db.Bids.Add(initBid);
                     db.SaveChanges();
+
+                    auction.LastBidId = initBid.Id;
+
+                    var auctionInitBit = new BidAuction
+                    {
+                        BidId = initBid.Id,
+                        AuctionId = auction.Id
+                    };
+
+                    db.BidAuctions.Add(auctionInitBit);
+                    db.SaveChanges();
+
                 }
+
                 catch (System.Data.Entity.Validation.DbEntityValidationException e)
                 {
                     string msg = "";
