@@ -13,6 +13,6 @@ namespace IEP_Auction.Models
 
         public long? Tokens { get; set; }
 
-        public virtual AspNetUsers AspNetUsers { get; set; }
+        public virtual AspNetUser AspNetUser { get; set; }
     }
 }

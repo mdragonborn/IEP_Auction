@@ -6,7 +6,7 @@ namespace IEP_Auction.Models
     using System.ComponentModel.DataAnnotations.Schema;
     using System.Data.Entity.Spatial;
 
-    public partial class TokenOrders
+    public partial class TokenOrder
     {
         public Guid Id { get; set; }
 
@@ -21,6 +21,6 @@ namespace IEP_Auction.Models
 
         public DateTime Time { get; set; }
 
-        public virtual AspNetUsers AspNetUsers { get; set; }
+        public virtual AspNetUser AspNetUser { get; set; }
     }
 }

@@ -20,7 +20,7 @@ namespace IEP_Auction.Views
         // GET: Auctions
         public ActionResult Index()
         {
-            var auction = db.Auction.Include(a => a.Bid);
+            var auction = db.Auctions.Include(a => a.Bid);
             return View(auction.ToList());
         }
 
@@ -31,7 +31,7 @@ namespace IEP_Auction.Views
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Auction auction = db.Auction.Find(id);
+            Auction auction = db.Auctions.Find(id);
             if (auction == null)
             {
                 return HttpNotFound();
@@ -42,7 +42,7 @@ namespace IEP_Auction.Views
         // GET: Auctions/Create
         public ActionResult Create()
         {
-            ViewBag.LastBidId = new SelectList(db.Bid, "Id", "UserId");
+            ViewBag.LastBidId = new SelectList(db.Bids, "Id", "UserId");
             return View();
         }
 
@@ -64,8 +64,7 @@ namespace IEP_Auction.Views
                 {
                     Id = id,
                     CreatorId = User.Identity.GetUserId(),
-                    TimeStart = DateTime.Now,
-                    TimeEnd = DateTime.Now + auctionData.AuctionLength,
+                    DurationMinutes = (int)auctionData.AuctionLength.TotalMinutes,
                     Status = "OPENED",
                     LastBidId = null,
                     Name = auctionData.Name,
@@ -73,16 +72,9 @@ namespace IEP_Auction.Views
                     ImagePath = imgPath
                 };
 
-                var initBid = new Bid
-                {
-                    Time = auction.TimeStart,
-                    Amount = auctionData.InitialPrice,
-                    UserId = User.Identity.GetUserId()
-                };
                 try
                 {
-                    db.Auction.Add(auction);
-                    db.Bid.Add(initBid);
+                    db.Auctions.Add(auction);
                     db.SaveChanges();
                 }
                 catch (System.Data.Entity.Validation.DbEntityValidationException e)
@@ -100,14 +92,6 @@ namespace IEP_Auction.Views
                     return RedirectToAction(auction.Id.ToString(), "Auctions/Details");
                 }
 
-                var auctionInitBit = new BidAuction
-                {
-                    BidId = initBid.Id,
-                    AuctionId = auction.Id
-                };
-
-                db.BidAuction.Add(auctionInitBit);
-                db.SaveChanges();
                 // redirect to auction page ?
                 return RedirectToAction(auction.Id.ToString(), "Auctions/Details");
             }
@@ -122,12 +106,12 @@ namespace IEP_Auction.Views
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Auction auction = db.Auction.Find(id);
+            Auction auction = db.Auctions.Find(id);
             if (auction == null)
             {
                 return HttpNotFound();
             }
-            ViewBag.LastBidId = new SelectList(db.Bid, "Id", "UserId", auction.LastBidId);
+            ViewBag.LastBidId = new SelectList(db.Bids, "Id", "UserId", auction.LastBidId);
             return View(auction);
         }
 
@@ -144,7 +128,7 @@ namespace IEP_Auction.Views
                 db.SaveChanges();
                 return RedirectToAction("Index");
             }
-            ViewBag.LastBidId = new SelectList(db.Bid, "Id", "UserId", auction.LastBidId);
+            ViewBag.LastBidId = new SelectList(db.Bids, "Id", "UserId", auction.LastBidId);
             return View(auction);
         }
 
@@ -155,7 +139,7 @@ namespace IEP_Auction.Views
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Auction auction = db.Auction.Find(id);
+            Auction auction = db.Auctions.Find(id);
             if (auction == null)
             {
                 return HttpNotFound();
@@ -168,8 +152,8 @@ namespace IEP_Auction.Views
         [ValidateAntiForgeryToken]
         public ActionResult DeleteConfirmed(Guid id)
         {
-            Auction auction = db.Auction.Find(id);
-            db.Auction.Remove(auction);
+            Auction auction = db.Auctions.Find(id);
+            db.Auctions.Remove(auction);
             db.SaveChanges();
             return RedirectToAction("Index");
         }

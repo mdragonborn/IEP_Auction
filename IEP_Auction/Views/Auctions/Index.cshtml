@@ -36,7 +36,8 @@
             @Html.DisplayNameFor(model => model.Description)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.ImagePath)
+            Image
+            @*@Html.DisplayNameFor(model => model.ImagePath)*@
         </th>
         <th>
             @Html.DisplayNameFor(model => model.Status)
@@ -45,13 +46,15 @@
             Time left
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.AspNetUsers.Email)
+            @Html.DisplayNameFor(model => model.AspNetUser.Email)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.TimeStart)
+            Start time
+            @*@Html.DisplayNameFor(model => model.TimeStart)*@
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.TimeEnd)
+            End Time
+            @*@Html.DisplayNameFor(model => model.TimeEnd)*@
         </th>
         <th></th>
     </tr>
@@ -75,7 +78,7 @@
                 @(DateTime.Now - item.TimeStart)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.AspNetUsers.Email)
+                @Html.DisplayFor(modelItem => item.AspNetUser.Email)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.TimeStart)

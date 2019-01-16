@@ -6,18 +6,18 @@ namespace IEP_Auction.Models
     using System.ComponentModel.DataAnnotations.Schema;
     using System.Data.Entity.Spatial;
 
-    public partial class AspNetUsers
+    public partial class AspNetUser
     {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
-        public AspNetUsers()
+        public AspNetUser()
         {
-            AspNetUserClaims = new HashSet<AspNetUserClaims>();
-            AspNetUserLogins = new HashSet<AspNetUserLogins>();
-            Auction = new HashSet<Auction>();
-            Bid = new HashSet<Bid>();
-            Reservation = new HashSet<Reservation>();
-            TokenOrders = new HashSet<TokenOrders>();
-            AspNetRoles = new HashSet<AspNetRoles>();
+            AspNetUserClaims = new HashSet<AspNetUserClaim>();
+            AspNetUserLogins = new HashSet<AspNetUserLogin>();
+            Auctions = new HashSet<Auction>();
+            Bids = new HashSet<Bid>();
+            Reservations = new HashSet<Reservation>();
+            TokenOrders = new HashSet<TokenOrder>();
+            AspNetRoles = new HashSet<AspNetRole>();
         }
 
         public string Id { get; set; }
@@ -52,26 +52,26 @@ namespace IEP_Auction.Models
         public string UserName { get; set; }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<AspNetUserClaims> AspNetUserClaims { get; set; }
+        public virtual ICollection<AspNetUserClaim> AspNetUserClaims { get; set; }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<AspNetUserLogins> AspNetUserLogins { get; set; }
+        public virtual ICollection<AspNetUserLogin> AspNetUserLogins { get; set; }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<Auction> Auction { get; set; }
+        public virtual ICollection<Auction> Auctions { get; set; }
 
         public virtual Balance Balance { get; set; }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<Bid> Bid { get; set; }
+        public virtual ICollection<Bid> Bids { get; set; }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<Reservation> Reservation { get; set; }
+        public virtual ICollection<Reservation> Reservations { get; set; }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<TokenOrders> TokenOrders { get; set; }
+        public virtual ICollection<TokenOrder> TokenOrders { get; set; }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<AspNetRoles> AspNetRoles { get; set; }
+        public virtual ICollection<AspNetRole> AspNetRoles { get; set; }
     }
 }

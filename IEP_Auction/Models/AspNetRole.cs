@@ -6,12 +6,12 @@ namespace IEP_Auction.Models
     using System.ComponentModel.DataAnnotations.Schema;
     using System.Data.Entity.Spatial;
 
-    public partial class AspNetRoles
+    public partial class AspNetRole
     {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
-        public AspNetRoles()
+        public AspNetRole()
         {
-            AspNetUsers = new HashSet<AspNetUsers>();
+            AspNetUsers = new HashSet<AspNetUser>();
         }
 
         public string Id { get; set; }
@@ -21,6 +21,6 @@ namespace IEP_Auction.Models
         public string Name { get; set; }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<AspNetUsers> AspNetUsers { get; set; }
+        public virtual ICollection<AspNetUser> AspNetUsers { get; set; }
     }
 }

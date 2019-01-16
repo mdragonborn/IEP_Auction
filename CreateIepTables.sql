@@ -1,5 +1,12 @@
 USE IepDb;
 
+DROP TABLE IF EXISTS dbo.Balance;
+DROP TABLE IF EXISTS dbo.BidAuction;
+DROP TABLE IF EXISTS dbo.Bid;
+DROP TABLE IF EXISTS dbo.Reservation;
+DROP TABLE IF EXISTS dbo.TokenOrders;
+DROP TABLE IF EXISTS dbo.Auction;
+
 CREATE TABLE dbo.Bid
 (
 	Id bigint IDENTITY(1,1) PRIMARY KEY NOT NULL,
@@ -12,9 +19,10 @@ CREATE TABLE dbo.Bid
 CREATE TABLE dbo.Auction
 	(Id uniqueidentifier PRIMARY KEY NOT NULL,
 	CreatorId nvarchar(128) NOT NULL,
-	Status nvarchar(10) NOT NULL DEFAULT 'OPENED',
-	TimeStart datetime NOT NULL,
-	TimeEnd datetime NOT NULL,
+	Status nvarchar(10) NOT NULL DEFAULT 'READY',
+	DurationMinutes int NOT NULL,
+	TimeStart datetime,
+	TimeEnd datetime,
 	LastBidId bigint,
 	Name nvarchar(128) NOT NULL,
 	Description text NOT NULL,

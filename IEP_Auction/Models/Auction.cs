@@ -12,7 +12,7 @@ namespace IEP_Auction.Models
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
         public Auction()
         {
-            BidAuction = new HashSet<BidAuction>();
+            BidAuctions = new HashSet<BidAuction>();
         }
 
         public Guid Id { get; set; }
@@ -25,9 +25,11 @@ namespace IEP_Auction.Models
         [StringLength(10)]
         public string Status { get; set; }
 
-        public DateTime TimeStart { get; set; }
+        public int DurationMinutes { get; set; }
 
-        public DateTime TimeEnd { get; set; }
+        public DateTime? TimeStart { get; set; }
+
+        public DateTime? TimeEnd { get; set; }
 
         public long? LastBidId { get; set; }
 
@@ -43,11 +45,11 @@ namespace IEP_Auction.Models
         [StringLength(256)]
         public string ImagePath { get; set; }
 
-        public virtual AspNetUsers AspNetUsers { get; set; }
+        public virtual AspNetUser AspNetUser { get; set; }
 
         public virtual Bid Bid { get; set; }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<BidAuction> BidAuction { get; set; }
+        public virtual ICollection<BidAuction> BidAuctions { get; set; }
     }
 }

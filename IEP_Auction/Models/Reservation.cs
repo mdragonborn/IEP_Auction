@@ -20,7 +20,7 @@ namespace IEP_Auction.Models
 
         public long? Amount { get; set; }
 
-        public virtual AspNetUsers AspNetUsers { get; set; }
+        public virtual AspNetUser AspNetUser { get; set; }
 
         public virtual Bid Bid { get; set; }
     }
