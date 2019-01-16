@@ -75,7 +75,13 @@
                 @Html.DisplayFor(modelItem => item.Status)
             </td>
             <td>
-                @(DateTime.Now - item.TimeStart)
+                @if (item.TimeEnd > DateTime.Now) {
+                    @(item.TimeEnd - DateTime.Now)
+                }
+                else
+                {
+                    @(new TimeSpan(0))
+                }
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.AspNetUser.Email)

@@ -99,6 +99,22 @@ namespace IEP_Auction.Views
             return View(auctionData);
         }
 
+        [HttpPost]
+        public JsonResult Start(string guid) {
+            if (User.IsInRole("Admin"))
+            {
+                Auction auction = db.Auctions.Find(new Guid(guid));
+                if (auction == null)
+                    return Json(new { status = "WrongGuid" });
+                auction.TimeStart = DateTime.Now;
+                auction.TimeEnd = auction.TimeStart + new TimeSpan(0, auction.DurationMinutes, 0);
+                auction.Status = "OPENED";
+                db.SaveChanges();
+                return Json(new { status = "Success" });
+            }
+            return Json(new { status = "NotAuthorized" });
+        }
+
         // GET: Auctions/Edit/5
         public ActionResult Edit(Guid? id)
         {
