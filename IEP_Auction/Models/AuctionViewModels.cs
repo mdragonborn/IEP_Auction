@@ -54,4 +54,13 @@ namespace IEP_Auction.Models
         [Display(Name= "Upload item image")]
         public HttpPostedFileBase File { get; set; }
     }
+
+    public class CreateBidModel
+    {
+        [Required]
+        [Display(Name = "Bid Amount")]
+        public int TokenAmount { get; set; }
+
+        public Guid AuctionGuid { get; set; }
+    }
 }

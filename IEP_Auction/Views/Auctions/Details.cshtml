@@ -14,7 +14,10 @@
         @if (User.IsInRole("Admin")) {
             @Html.ActionLink("Edit", "Edit", new { id = Model.Id })
         }
-        | @Html.ActionLink("Back to List", "Index")
+        | @Html.ActionLink("Back to List", "Index") | 
+        @if (Model.Status == "OPENED" && Model.TimeEnd > DateTime.Now) {
+            @Html.ActionLink("Bid", "Bid", new { guid = Model.Id })
+        }
     </p>
     <dl class="dl-horizontal">
         <dt>

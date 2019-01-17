@@ -42,7 +42,6 @@ namespace IEP_Auction.Views
         // GET: Auctions/Create
         public ActionResult Create()
         {
-            ViewBag.LastBidId = new SelectList(db.Bids, "Id", "UserId");
             return View();
         }
 
@@ -116,6 +115,106 @@ namespace IEP_Auction.Views
                 return RedirectToAction(auction.Id.ToString(), "Auctions/Details");
             }
             ViewBag.errmsg = "model validation fail";
+            return View(auctionData);
+        }
+
+
+        // GET: Auctions/Bid
+        public ActionResult Bid(Guid guid)
+        {
+            ViewBag.AuctionGuid = guid;
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Bid(CreateBidModel auctionData)
+        {
+            ViewBag.AuctionGuid = auctionData.AuctionGuid;
+            if (ModelState.IsValid)
+            {
+
+                using (var transaction = db.Database.BeginTransaction())
+                {
+                    Auction auction = db.Auctions.Find(auctionData.AuctionGuid);
+                    if (auction == null)
+                    {
+                        ViewBag.ErrMsg = "Auction doesn't exist";
+                        transaction.Dispose();
+                        return View(auctionData);
+                    }
+                    if (auction.Bid.Amount >= auctionData.TokenAmount)
+                    {
+                        ViewBag.ErrMsg = "Bid must be larger than last bid. Current bid: " + auction.Bid.Amount + " tokens.";
+                        transaction.Dispose();
+                        return View(auctionData);
+                    }
+
+                    var previousBid = auction.Bid;
+
+                    var prevReservation = db.Reservations.Find(previousBid.Id, previousBid.UserId);
+
+                    if (prevReservation != null)
+                    {
+                        prevReservation.AspNetUser.Balance.Tokens += prevReservation.Amount;
+                        db.Reservations.Remove(prevReservation);
+                    }
+
+                    var userId = User.Identity.GetUserId();
+                    Balance balance = db.Balances.Find(userId);
+
+                    if (balance == null || balance.Tokens <= auctionData.TokenAmount)
+                    {
+                        ViewBag.ErrMsg = "Insufficient funds.";
+                        transaction.Dispose();
+                        return View(auctionData);
+                    }
+
+
+                    Bid bid = new Models.Bid {
+                        Amount = auctionData.TokenAmount,
+                        Time = DateTime.Now,
+                        UserId = userId,
+                    };
+
+                    balance.Tokens -= auctionData.TokenAmount;
+                    db.Bids.Add(bid);
+                    db.SaveChanges();
+
+                    BidAuction bidAuction = new BidAuction
+                    {
+                        BidId = bid.Id,
+                        AuctionId = auction.Id
+                    };
+                    db.BidAuctions.Add(bidAuction);
+
+                    Reservation reservation = new Reservation
+                    {
+                        UserId = userId,
+                        Amount = auctionData.TokenAmount,
+                        BidId = bid.Id
+                    };
+
+                    db.Reservations.Add(reservation);
+
+                    auction.LastBidId = bid.Id;
+
+                    db.SaveChanges();
+
+                    try
+                    {
+                        transaction.Commit();
+                    }
+                    catch (Exception e)
+                    {
+                        transaction.Rollback();
+                        ViewBag.ErrMsg = "Error. Please try again.";
+                        return View(auctionData);
+                    }
+                    return RedirectToAction("Details", "Auctions", new { Id = auctionData.AuctionGuid });
+                }
+            }
+            ViewBag.ErrMsg = "Amount can't be empty.";
             return View(auctionData);
         }
 

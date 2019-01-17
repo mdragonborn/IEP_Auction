@@ -107,7 +107,11 @@
                 @Html.DisplayFor(modelItem => item.TimeEnd)
             </td>
             <td>
-                @Html.ActionLink("Details", "Details", new { id = item.Id })
+                @Html.ActionLink("Details", "Details", new { id = item.Id })<br/>
+                @if (item.Status == "OPENED" && item.TimeEnd > DateTime.Now)
+                {
+                    @Html.ActionLink("Bid", "Bid", new { guid = item.Id })<br />
+                }
                 @if (Request.IsAuthenticated)
 
                 {
