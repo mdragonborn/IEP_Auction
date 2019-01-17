@@ -29,6 +29,7 @@ namespace IEP_Auction.Views
         // GET: Auctions/Details/5
         public ActionResult Details(Guid? id)
         {
+            ViewBag.guid = id;
             if (id == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
@@ -207,7 +208,8 @@ namespace IEP_Auction.Views
                     try
                     {
                         transaction.Commit();
-                        notificationContext.NotifyAll(new { auction = auction.Id, price = bid.Amount, user = userId }, "NewBid");                        
+                        notificationContext.NotifyAll(new { auction = auction.Id, price = bid.Amount, user = userId }, "NewBid");
+                        notificationContext.NewBid(auction.Id.ToString(), new { price = bid.Amount, user = userId });
                     }
                     catch (Exception e)
                     {

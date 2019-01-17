@@ -15,5 +15,20 @@ namespace IEP_Auction.Hubs
             context.Clients.All.displayNotification(new JavaScriptSerializer().Serialize(update), alertType);
         }
 
+        public void NewBid(string group, object update)
+        {
+            context.Clients.Group(group).newBid(new JavaScriptSerializer().Serialize(update));
+        }
+
+        public void JoinGroup(string groupName)
+        {
+            Groups.Add(Context.ConnectionId, groupName);
+        }
+
+        public void removeGroup(string groupName)
+        {
+            Groups.Remove(Context.ConnectionId, groupName);
+        }
+
     }
 }
