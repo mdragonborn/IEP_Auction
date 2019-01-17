@@ -10,6 +10,7 @@
 <div>
     <h4>Auction</h4>
     <hr />
+    <div id="alert-placeholder"></div>
     <p>
         @if (User.IsInRole("Admin")) {
             @Html.ActionLink("Edit", "Edit", new { id = Model.Id })
@@ -29,7 +30,7 @@
         </dd>
 
         <dt>
-            @Html.DisplayNameFor(model => model.CreatorId)
+            @Html.DisplayNameFor(model => model.Id)
         </dt>
 
         <dd>
@@ -85,4 +86,36 @@
         </dd>
 
     </dl>
+
+    @section Scripts{
+        <script src="~/Scripts/jquery.signalR-2.4.0.js"></script>
+        <script src="~/SignalR/Hubs"></script>
+        <script type="text/javascript">
+        function htmlEncode(value) {
+            return $('<div />').text(value).html();
+        }
+
+        //execute on document ready
+        $(function () {
+            $.connection.hub.start()
+    .done(function () { console.log('Now connected, connection ID=' + $.connection.hub.id); })
+    .fail(function () { console.log('Could not Connect!'); });
+            //function that the hub can call when it receives a notification.
+            $.connection.notificationHub.client.displayNotification = function (update, alertType) {
+                //Create the bootstrap alert html
+                var jsonUpdate = JSON.parse(update);
+                var alertHtml = '<div class="alert alert-dismissible" role="alert"><button type="button" class="close" data-dismiss="alert"><span>×</span></button><strong>' + htmlEncode(jsonUpdate.price) + '</strong> ' + htmlEncode(htmlEncode(jsonUpdate.user)) + '</div>';
+                $(alertHtml)
+                  .hide()                           //hide the newly created element (this is required for fadeIn to work)
+                  .appendTo('#alert-placeholder')   //add it to the palceholder in the page
+                  .fadeIn(500);                     //little flair to grab user attention
+            };
+
+            window.notifyApp = {
+                hubConnector: $.connection.hub.start()  //start the connection and store object returned globally for access in child views
+            };
+
+        });
+        </script>
+    }
 </div>

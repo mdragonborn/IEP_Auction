@@ -10,12 +10,14 @@ using System.Security.Principal;
 using Microsoft.AspNet.Identity;
 using IEP_Auction.Models;
 using System.Diagnostics;
+using Microsoft.AspNet.SignalR;
 
 namespace IEP_Auction.Views
 {
     public class AuctionsController : Controller
     {
         private IepAuction db = new IepAuction();
+        private Hubs.NotificationHub notificationContext = new Hubs.NotificationHub();
 
         // GET: Auctions
         public ActionResult Index()
@@ -36,6 +38,7 @@ namespace IEP_Auction.Views
             {
                 return HttpNotFound();
             }
+
             return View(auction);
         }
 
@@ -204,6 +207,7 @@ namespace IEP_Auction.Views
                     try
                     {
                         transaction.Commit();
+                        notificationContext.NotifyAll(new { auction = auction.Id, price = bid.Amount, user = userId }, "NewBid");                        
                     }
                     catch (Exception e)
                     {

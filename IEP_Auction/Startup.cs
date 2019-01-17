@@ -9,6 +9,7 @@ namespace IEP_Auction
         public void Configuration(IAppBuilder app)
         {
             ConfigureAuth(app);
+            app.MapSignalR();
         }
     }
 }
