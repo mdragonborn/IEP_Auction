@@ -65,10 +65,24 @@ namespace IEP_Auction.Views
             }
         }
 
+        // private bool containsAny(string SearchString, string Name)
+        // {
+        //     var tokens = SearchString.Split(' ');
+        //     if (tokens.Count() == 0) return true;
+        //     foreach(string token in tokens)
+        //     {
+        //         if (Name.Contains(token)) return true;
+        //     }
+
+        //     return false;
+        // }
+
         // GET: Auctions
-        public ActionResult Index()
+        public ActionResult Index(String SearchString)
         {
-            var auction = db.Auctions.Include(a => a.Bid);
+            if (SearchString == null) SearchString = "";
+            var tokens = SearchString.Split(' ');
+            var auction = db.Auctions.Where(a => SearchString == "" || a.Name.Contains(SearchString));
             return View(auction.ToList());
         }
 
@@ -90,6 +104,7 @@ namespace IEP_Auction.Views
         }
 
         // GET: Auctions/Create
+        [System.Web.Mvc.Authorize]
         public ActionResult Create()
         {
             return View();
@@ -100,11 +115,13 @@ namespace IEP_Auction.Views
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [System.Web.Mvc.Authorize]
         public ActionResult Create(CreateAuctionModel auctionData)
         {
             if (ModelState.IsValid)
             {
                 var file = auctionData.File;
+                
                 var id = Guid.NewGuid();
                 var imgPath = "/auctionItems/" + id + file.FileName;
                 file.SaveAs(Server.MapPath("~" + imgPath));
@@ -170,6 +187,7 @@ namespace IEP_Auction.Views
 
 
         // GET: Auctions/Bid
+        [System.Web.Mvc.Authorize]
         public ActionResult Bid(Guid guid)
         {
             ViewBag.AuctionGuid = guid;
@@ -178,6 +196,7 @@ namespace IEP_Auction.Views
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [System.Web.Mvc.Authorize]
         public ActionResult Bid(CreateBidModel auctionData)
         {
             ViewBag.AuctionGuid = auctionData.AuctionGuid;
@@ -287,6 +306,7 @@ namespace IEP_Auction.Views
         }
 
         // GET: Auctions/Edit/5
+        [System.Web.Mvc.Authorize(Roles = "Admin")]
         public ActionResult Edit(Guid? id)
         {
             if (id == null)
@@ -307,6 +327,7 @@ namespace IEP_Auction.Views
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [System.Web.Mvc.Authorize(Users = "Admin")]
         public ActionResult Edit([Bind(Include = "Id,CreatorId,Status,TimeStart,TimeEnd,LastBidId,Name,Description,ImagePath")] Auction auction)
         {
             if (ModelState.IsValid)
