@@ -96,4 +96,10 @@ namespace IEP_Auction.Models
         public string SelectedProvider { get; set; }
         public ICollection<System.Web.Mvc.SelectListItem> Providers { get; set; }
     }
+
+    public class MyAuctionsViewModel
+    {
+        public List<Auction> myAuctions;
+        public List<Auction> biddedAuctions;
+    }
 }

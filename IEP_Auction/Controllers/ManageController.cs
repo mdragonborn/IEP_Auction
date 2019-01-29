@@ -15,6 +15,7 @@ namespace IEP_Auction.Controllers
     {
         private ApplicationSignInManager _signInManager;
         private ApplicationUserManager _userManager;
+        private IepAuction db = new IepAuction();
 
         public ManageController()
         {
@@ -73,6 +74,24 @@ namespace IEP_Auction.Controllers
                 // TODO view tokens
             };
             return View(model);
+        }
+
+        public ActionResult ViewAuctions()
+        {
+            var userId = User.Identity.GetUserId();
+            var myAuctions = (from a in db.Auctions
+                              where a.CreatorId == userId
+                              select a);
+            var user = db.AspNetUsers.Find(userId);
+            var biddedAuctions = (from a in db.BidAuctions
+                                    join b in db.Bids on a.BidId equals b.Id
+                                    join aa in db.Auctions on a.AuctionId equals aa.Id
+                                    where b.UserId == userId && aa.CreatorId != userId
+                                    select aa);
+            
+            return View(new MyAuctionsViewModel { myAuctions = myAuctions.ToList(),
+                biddedAuctions = biddedAuctions.ToList()
+            });
         }
 
         //
