@@ -63,4 +63,12 @@ namespace IEP_Auction.Models
 
         public Guid AuctionGuid { get; set; }
     }
+
+    public class DetailsModel {
+        [Required]
+        public Auction Auction;
+
+        [Required]
+        public List<BidAuction> Bids;
+    }
 }

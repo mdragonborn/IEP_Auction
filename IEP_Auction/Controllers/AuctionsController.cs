@@ -89,6 +89,7 @@ namespace IEP_Auction.Views
         // GET: Auctions/Details/5
         public ActionResult Details(Guid? id)
         {
+            var detailsModel = new DetailsModel();
             ViewBag.guid = id;
             if (id == null)
             {
@@ -100,7 +101,14 @@ namespace IEP_Auction.Views
                 return HttpNotFound();
             }
 
-            return View(auction);
+            detailsModel.Auction = auction;
+            var bids = (from a in db.BidAuctions
+                        where a.AuctionId == id
+                        select a);
+            bids = bids.OrderByDescending(a => a.Bid.Time);
+            detailsModel.Bids = bids.ToList();
+
+            return View(detailsModel);
         }
 
         // GET: Auctions/Create
@@ -230,6 +238,7 @@ namespace IEP_Auction.Views
                     }
 
                     var userId = User.Identity.GetUserId();
+                    AspNetUser currentUser = db.AspNetUsers.Find(userId);
                     Balance balance = db.Balances.Find(userId);
 
                     if (balance == null || balance.Tokens <= auctionData.TokenAmount)
@@ -274,7 +283,7 @@ namespace IEP_Auction.Views
                     {
                         transaction.Commit();
                         notificationContext.NotifyAll(new { auction = auction.Id, price = bid.Amount, user = userId }, "NewBid");
-                        notificationContext.NewBid(auction.Id.ToString(), new { price = bid.Amount, user = userId });
+                        notificationContext.NewBid(auction.Id.ToString(), new { price = bid.Amount, user = currentUser.Email, time = bid.Time.ToString() });
                     }
                     catch (Exception e)
                     {

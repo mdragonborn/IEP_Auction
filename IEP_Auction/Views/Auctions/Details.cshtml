@@ -1,4 +1,4 @@
-﻿@model IEP_Auction.Models.Auction
+﻿@model IEP_Auction.Models.DetailsModel
 
 @{
     ViewBag.Title = "Details";
@@ -13,81 +13,107 @@
     <div id="alert-placeholder"></div>
     <p>
         @if (User.IsInRole("Admin")) {
-            @Html.ActionLink("Edit", "Edit", new { id = Model.Id })
+            @Html.ActionLink("Edit", "Edit", new { id = Model.Auction.Id })
         }
         | @Html.ActionLink("Back to List", "Index") | 
-        @if (Model.Status == "OPENED" && Model.TimeEnd > DateTime.Now) {
-            @Html.ActionLink("Bid", "Bid", new { guid = Model.Id })
+        @if (Model.Auction.Status == "OPENED" && Model.Auction.TimeEnd > DateTime.Now) {
+            @Html.ActionLink("Bid", "Bid", new { guid = Model.Auction.Id })
         }
     </p>
     <dl class="dl-horizontal">
-        <dt>
-            @Html.DisplayNameFor(model => model.Bid.UserId)
+                <dt>
+            Item name
         </dt>
 
         <dd>
-            @Html.DisplayFor(model => model.Bid.UserId)
+            @Html.DisplayFor(model => model.Auction.Name)
         </dd>
 
         <dt>
-            @Html.DisplayNameFor(model => model.Id)
+            @Html.DisplayNameFor(model => model.Auction.Description)
         </dt>
 
         <dd>
-            @Html.DisplayFor(model => model.CreatorId)
+            @Html.DisplayFor(model => model.Auction.Description)
+        </dd>
+        <dt>
+        </dt>
+        <dd>
+            <img src=@Html.DisplayFor(model => model.Auction.ImagePath) height="100px">
+        </dd>
+        <dt>
+            Auction creator
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Auction.AspNetUser.Email)
+        </dd>
+        <dt>
+            Status
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Auction.Status)
+        </dd>
+        <dt>
+            Current price
+        </dt>
+        <dd>
+            @Html.DisplayFor(model=>model.Auction.Bid.Amount)
+        </dd>
+        @if (Model.Auction.Status == "READY")
+        {
+            <dt>Auction Length (minutes)</dt>
+            <dd>@Html.DisplayFor(model => model.Auction.DurationMinutes)</dd>
+        }
+        else
+        {
+        <dt>
+            Current bidder
+        </dt>
+                if (Model.Auction.Bid.AspNetUser.Id != Model.Auction.CreatorId)
+                {
+                <dd>@Html.DisplayFor(model => model.Auction.Bid.AspNetUser.Email)</dd>
+                }
+                else { <dd>None</dd> }
+
+        <dt>
+            Start time
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Auction.TimeStart)
         </dd>
 
         <dt>
-            @Html.DisplayNameFor(model => model.Status)
+            End time
         </dt>
 
         <dd>
-            @Html.DisplayFor(model => model.Status)
+            @Html.DisplayFor(model => model.Auction.TimeEnd)
         </dd>
-
-        <dt>
-            @Html.DisplayNameFor(model => model.TimeStart)
-        </dt>
-
-        <dd>
-            @Html.DisplayFor(model => model.TimeStart)
-        </dd>
-
-        <dt>
-            @Html.DisplayNameFor(model => model.TimeEnd)
-        </dt>
-
-        <dd>
-            @Html.DisplayFor(model => model.TimeEnd)
-        </dd>
-
-        <dt>
-            @Html.DisplayNameFor(model => model.Name)
-        </dt>
-
-        <dd>
-            @Html.DisplayFor(model => model.Name)
-        </dd>
-
-        <dt>
-            @Html.DisplayNameFor(model => model.Description)
-        </dt>
-
-        <dd>
-            @Html.DisplayFor(model => model.Description)
-        </dd>
-
-        <dt>
-            @Html.DisplayNameFor(model => model.ImagePath)
-        </dt>
-
-
-
-        <dd>
-            <img src=@Html.DisplayFor(model => model.ImagePath)>
-        </dd>
+        }
 
     </dl>
+
+    <h3>Bids</h3>
+    <div id="bidContainer">
+        @foreach (var bid in Model.Bids)
+        {
+            <div class="alert" role="alert" style="margin-bottom:0; padding:5px">
+                @Html.DisplayFor(bidItem => bid.Bid.Time)
+               : Bid by 
+                <strong>
+                @Html.DisplayFor(bidItem => bid.Bid.AspNetUser.Email)
+                </strong>
+                for amount 
+                <strong>
+                    @Html.DisplayFor(bidItem => bid.Bid.Amount)
+                </strong>
+        </div>
+        }
+    </div>
+
     <span id="guid" data="@(ViewBag.guid)" type="hidden"></span>
 
     @section Scripts{
@@ -109,13 +135,19 @@
 
 
                 //function that the hub can call when it receives a notification.
-                $.connection.notificationHub.client.displayNotification = function (update, alertType) {
+                $.connection.notificationHub.client.newBid = function (update, alertType) {
                     //Create the bootstrap alert html
                     var jsonUpdate = JSON.parse(update);
-                    var alertHtml = '<div class="alert alert-dismissible" role="alert"><button type="button" class="close" data-dismiss="alert"><span>×</span></button><strong>' + htmlEncode(jsonUpdate.price) + '</strong> ' + htmlEncode(htmlEncode(jsonUpdate.user)) + '</div>';
+                    var alertHtml = '<div class="alert" role="alert" style="margin-bottom:0; padding:5px">'
+                        + htmlEncode(jsonUpdate.time)
+                        + ' : Bid by <strong>'
+                        + htmlEncode(jsonUpdate.user)
+                        + '</strong> for amount <strong>'
+                        + htmlEncode(jsonUpdate.price)
+                        + '</strong></div>';
                     $(alertHtml)
-                      .hide()                           //hide the newly created element (this is required for fadeIn to work)
-                      .appendTo('#alert-placeholder')   //add it to the palceholder in the page
+                      .hide() //hide the newly created element (this is required for fadeIn to work)
+                      .prependTo('#bidContainer')   //add it to the palceholder in the page
                       .fadeIn(500);                     //little flair to grab user attention
                 };
 
@@ -128,5 +160,5 @@
                 $.connection.notificationHub.server.removeGroup(document.getElementById("guid").getAttribute("data"));
             })
         </script>
-    }
+        }
 </div>
