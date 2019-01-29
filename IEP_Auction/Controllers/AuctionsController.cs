@@ -11,6 +11,7 @@ using Microsoft.AspNet.Identity;
 using IEP_Auction.Models;
 using System.Diagnostics;
 using Microsoft.AspNet.SignalR;
+using System.Threading;
 
 namespace IEP_Auction.Views
 {
@@ -18,6 +19,51 @@ namespace IEP_Auction.Views
     {
         private IepAuction db = new IepAuction();
         private Hubs.NotificationHub notificationContext = new Hubs.NotificationHub();
+
+        static DateTime lastUpdate;
+
+        protected override void OnActionExecuting(ActionExecutingContext filterContext)
+        {
+            var time = DateTime.Now;
+            Mutex updateCheck = new Mutex(false, "Global/Update");
+            try
+            {
+                updateCheck.WaitOne();
+                if (time - lastUpdate < TimeSpan.FromSeconds(1))
+                    return;
+                lastUpdate = time;
+            } finally
+            {
+                updateCheck.ReleaseMutex();
+            }
+            using (var transaction = db.Database.BeginTransaction())
+            {
+                try
+                {
+                    var finishedAuctions = (from a in db.Auctions
+                                            where a.Status == "OPENED" && a.TimeEnd < time
+                                            select a).ToList();
+
+                    foreach(Auction auction in finishedAuctions)
+                    {
+                        auction.Status = "CLOSED";
+                        if (auction.Bid != null && auction.Bid.AspNetUser != auction.AspNetUser)
+                        {
+                            long amount = (long)auction.Bid.Reservations.ElementAt(0).Amount;
+                            db.Reservations.Remove(auction.Bid.Reservations.ElementAt(0));
+                            auction.AspNetUser.Balance.Tokens += amount;
+                        }
+                    }
+
+                    db.SaveChanges();
+                    transaction.Commit();
+                }
+                catch
+                {
+                    transaction.Rollback();
+                }
+            }
+        }
 
         // GET: Auctions
         public ActionResult Index()
