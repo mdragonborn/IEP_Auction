@@ -1,7 +1,7 @@
 ﻿@model IEnumerable<IEP_Auction.Models.Auction>
 
 @{
-    ViewBag.Title = "Index";
+    ViewBag.Title = "Auctions";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 <span id="timerLabel" runat="server"></span>
@@ -22,21 +22,44 @@
 
 </script>
 
-<h2>Index</h2>
+<h2>Auctions</h2>
 
 <div id="alert-placeholder"></div>
 
 <p>
     @Html.ActionLink("Create New", "Create")
 </p>
+<p>
+    @using (Html.BeginForm())
+    {
+
+
+    }
+<p>Page @ViewBag.pageNumber out of @ViewBag.pageCount</p>
 
 @using (Html.BeginForm())
 {
     <p>
-        Find by name: @Html.TextBox("SearchString")
-        <input type="submit" value="Search" />
+    @Html.TextBox("page", ViewBag.pageNumber != null ? (int)ViewBag.pageNumber : 1, new { type = "number", value= ViewBag.pageNumber })
+        <input type="submit" value="Go to page" /></p>
+    <p>
+        Find by name: @Html.TextBox("SearchString", (string)ViewBag.prevString)
     </p>
-}
+    <p>
+        Auction state:
+        <select name="auctionState">
+            <option value="" @{if (ViewBag.selectedState == "") { <text> selected="selected" </text> }}>Any</option>
+            <option value="READY" @{if (ViewBag.selectedState == "READY") { <text> selected="selected" </text> }}>Ready</option>
+            <option value="OPENED" @{if (ViewBag.selectedState == "OPENED") { <text> selected="selected" </text> }}>Opened</option>
+            <option value="COMPLETED" @{if (ViewBag.selectedState == "COMPLETED") { <text> selected="selected" </text> }}>Completed</option>
+        </select>
+    </p>
+    <p>
+        Min price: @Html.TextBox("minPrice", ViewBag.prevMin!=null?(int)ViewBag.prevMin:0, new { type = "number", placeholder = 0 })
+        Max price: @Html.TextBox("maxPrice", ViewBag.prevMax != null ? (int)ViewBag.prevMax : 0, new { type = "number", placeholder = 0 })
+    </p>
+    <input type="submit" value="Search" style="margin-bottom: 10px"/>
+    }
 
 <table class="table">
     <tr>

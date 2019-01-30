@@ -14,55 +14,57 @@ namespace IEP_Auction.Views
     public class PortalParametersController : Controller
     {
         private IepAuction db = new IepAuction();
-        private static IQueryable<PortalParameter>  parameters;
+        private static IQueryable<PortalParameter> parameters;
+        private static PortalParameter currency;
+        private static List<PortalParameter> tokenPacks;
+        private static int pageSize;
 
         public static IQueryable<PortalParameter> LoadParameters(IepAuction db)
         {
             parameters = (from p in db.PortalParameters
                           select p);
+
+            currency = parameters.Where(p => p.Type == "Currency").First();
+            tokenPacks = parameters.Where(p => p.Type == "TokenPack").ToList();
+            pageSize = (int)parameters.Where(p => p.Type == "PageSize").First().NumValue;
             return parameters;
         }
 
-        public static List<PortalParameter> GetCurrencies(IepAuction db=null)
+        public static List<PortalParameter> GetType(String type=null, IepAuction db = null)
         {
-            if(parameters == null)
+            if (parameters == null)
             {
-                if(db == null)
+                if (db == null)
                 {
-                    throw new InvalidExpressionException();
+                    db = new IepAuction();
                 }
                 LoadParameters(db);
             }
+            if(type!=null)
+            {
+                return parameters.Where(p => p.Type == type).ToList();
+            }
+            return null;
 
-            return parameters.Where(p => p.Type == "Currency").ToList();
+        }
+
+        public static int GetPageSize(IepAuction db = null)
+        {
+            GetType(null, db);
+            return pageSize;
         }
 
         public static List<PortalParameter> GetTokenPacks(IepAuction db = null)
         {
-            if (parameters == null)
-            {
-                if (db == null)
-                {
-                    throw new InvalidExpressionException();
-                }
-                LoadParameters(db);
-            }
-
-            return parameters.Where(p => p.Type == "TokenPack").ToList();
+            GetType(null, db);
+            return tokenPacks;
         }
 
-        public static string GetBaseCurrency(IepAuction db = null)
+        public static PortalParameter GetCurrency(IepAuction db = null)
         {
-            if (parameters == null)
-            {
-                if (db == null)
-                {
-                    throw new InvalidExpressionException();
-                }
-                LoadParameters(db);
-            }
+            GetType(null, db);
 
-            return parameters.Where(p => p.Type == "BasePortalCurrency").First().StrValue;
+            return currency;
         }
 
         // GET: PortalParameters

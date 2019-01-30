@@ -12,6 +12,7 @@ using IEP_Auction.Models;
 using System.Diagnostics;
 using Microsoft.AspNet.SignalR;
 using System.Threading;
+using LinqKit;
 
 namespace IEP_Auction.Views
 {
@@ -78,12 +79,55 @@ namespace IEP_Auction.Views
         // }
 
         // GET: Auctions
-        public ActionResult Index(String SearchString)
+        public ActionResult Index(String SearchString, String auctionState, String minPrice, String maxPrice, int? page)
         {
-            if (SearchString == null) SearchString = "";
-            var tokens = SearchString.Split(' ');
-            var auction = db.Auctions.Where(a => SearchString == "" || a.Name.Contains(SearchString));
-            return View(auction.ToList());
+            int pageSize = PortalParametersController.GetPageSize();
+            int min = minPrice==null||minPrice==""?0:int.Parse(minPrice);
+            int max = maxPrice==null || maxPrice=="" ? 0:int.Parse(maxPrice);
+            var predicate = PredicateBuilder.New<Auction>();
+            if (SearchString != null && SearchString != "")
+            {
+                ViewBag.prevString = SearchString;
+                var tokens = SearchString.Split(' ');
+                predicate.Or(a => SearchString == "");
+                foreach (string token in tokens)
+                {
+                    predicate = predicate.Or(a => a.Name.Contains(token));
+                }
+            }
+            if (auctionState != null && auctionState != "")
+            {
+                ViewBag.selectedState = auctionState;
+                predicate = predicate.And(a => a.Status == auctionState);
+            }
+            else ViewBag.selectedState = "";
+            if (min != 0 || max != 0)
+            {
+                ViewBag.prevMin = min;
+                ViewBag.prevMax = max;
+                predicate = predicate.And(a => a.Bid.Amount >= min && a.Bid.Amount <= max);
+            }
+            IQueryable<Auction> auction;
+            if (predicate.IsStarted)
+                auction = db.Auctions.AsExpandable().Where(predicate);
+            else
+                auction = db.Auctions;
+            if (auction.Count() > 0)
+            {
+                ViewBag.pageCount = (auction.Count() / pageSize)>0? auction.Count() / pageSize:1;
+                if (page == null || page <= 0) page = 1;
+                if (page > ViewBag.pageCount) page = ViewBag.pageCount;
+                ViewBag.pageNumber = page;
+                if (auction.Count() < pageSize)
+                    pageSize = auction.Count();
+                return View(auction.ToList().GetRange(pageSize * ((int)page - 1), pageSize));
+            }
+            else
+            {
+                ViewBag.pageCount = 0;
+                ViewBag.pageNumber = 0;
+                return View(auction.ToList());
+            }
         }
 
         // GET: Auctions/Details/5
