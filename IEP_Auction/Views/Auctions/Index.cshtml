@@ -8,11 +8,9 @@
 
 <script type="text/javascript">
 
-    function countdown()
-    {
+    function countdown() {
         seconds = document.getElementById("timerLabel").innerHTML;
-        if (seconds > 0)
-        {
+        if (seconds > 0) {
             document.getElementById("timerLabel").innerHTML = seconds - 1;
             setTimeout("countdown()", 1000);
         }
@@ -40,25 +38,26 @@
 @using (Html.BeginForm())
 {
     <p>
-    @Html.TextBox("page", ViewBag.pageNumber != null ? (int)ViewBag.pageNumber : 1, new { type = "number", value= ViewBag.pageNumber })
-        <input type="submit" value="Go to page" /></p>
-    <p>
-        Find by name: @Html.TextBox("SearchString", (string)ViewBag.prevString)
+        @Html.TextBox("page", ViewBag.pageNumber != null ? (int)ViewBag.pageNumber : 1, new { type = "number", value = ViewBag.pageNumber })
+        <input type="submit" value="Go to page" />
     </p>
-    <p>
-        Auction state:
-        <select name="auctionState">
-            <option value="" @{if (ViewBag.selectedState == "") { <text> selected="selected" </text> }}>Any</option>
-            <option value="READY" @{if (ViewBag.selectedState == "READY") { <text> selected="selected" </text> }}>Ready</option>
-            <option value="OPENED" @{if (ViewBag.selectedState == "OPENED") { <text> selected="selected" </text> }}>Opened</option>
-            <option value="COMPLETED" @{if (ViewBag.selectedState == "COMPLETED") { <text> selected="selected" </text> }}>Completed</option>
-        </select>
-    </p>
-    <p>
-        Min price: @Html.TextBox("minPrice", ViewBag.prevMin!=null?(int)ViewBag.prevMin:0, new { type = "number", placeholder = 0 })
-        Max price: @Html.TextBox("maxPrice", ViewBag.prevMax != null ? (int)ViewBag.prevMax : 0, new { type = "number", placeholder = 0 })
-    </p>
-    <input type="submit" value="Search" style="margin-bottom: 10px"/>
+        <p>
+            Find by name: @Html.TextBox("SearchString", (string)ViewBag.prevString)
+        </p>
+        <p>
+            Auction state:
+            <select name="auctionState">
+                <option value="" @{if (ViewBag.selectedState == "") { <text> selected="selected" </text>  }}>Any</option>
+                <option value="READY" @{if (ViewBag.selectedState == "READY") { <text> selected="selected" </text>  }}>Ready</option>
+                <option value="OPENED" @{if (ViewBag.selectedState == "OPENED") { <text> selected="selected" </text>  }}>Opened</option>
+                <option value="COMPLETED" @{if (ViewBag.selectedState == "COMPLETED") { <text> selected="selected" </text>  }}>Completed</option>
+            </select>
+        </p>
+        <p>
+            Min price: @Html.TextBox("minPrice", ViewBag.prevMin != null ? (int)ViewBag.prevMin : 0, new { type = "number", placeholder = 0 })
+            Max price: @Html.TextBox("maxPrice", ViewBag.prevMax != null ? (int)ViewBag.prevMax : 0, new { type = "number", placeholder = 0 })
+        </p>
+        <input type="submit" value="Search" style="margin-bottom: 10px" />
     }
 
 <table class="table">
@@ -115,7 +114,7 @@
                 @if (item.TimeEnd == null & item.TimeEnd <= DateTime.Now)
                 {
                     <span>CLOSED</span>
-        }
+                }
                 else
                 {
                     @Html.DisplayFor(modelItem => item.Status)
@@ -123,7 +122,8 @@
                 }
             </td>
             <td>
-                @if (item.TimeEnd > DateTime.Now) {
+                @if (item.TimeEnd > DateTime.Now)
+                {
                     @(item.TimeEnd - DateTime.Now)
                 }
                 else
@@ -141,7 +141,7 @@
                 @Html.DisplayFor(modelItem => item.TimeEnd)
             </td>
             <td>
-                @Html.ActionLink("Details", "Details", new { id = item.Id })<br/>
+                @Html.ActionLink("Details", "Details", new { id = item.Id })<br />
                 @if (item.Status == "OPENED" && item.TimeEnd > DateTime.Now)
                 {
                     @Html.ActionLink("Bid", "Bid", new { guid = item.Id })<br />
@@ -152,7 +152,7 @@
                     if (User.IsInRole("Admin") || ViewBag.UserId == (item.CreatorId))
                     {
                         @Html.ActionLink("Edit", "Edit", new { id = item.Id });<br />
-                            @Html.ActionLink("Delete", "Delete", new { id = item.Id });
+                        @Html.ActionLink("Delete", "Delete", new { id = item.Id });
                     }
                 }
 
@@ -161,32 +161,32 @@
     }
 
     @section Scripts{
-    <script src="~/Scripts/jquery.signalR-2.4.0.js"></script>
-    <script src="~/SignalR/Hubs"></script>
-    <script type="text/javascript">
-        function htmlEncode(value) {
-            return $('<div />').text(value).html();
-        }
+        <script src="~/Scripts/jquery.signalR-2.4.0.js"></script>
+        <script src="~/SignalR/Hubs"></script>
+        <script type="text/javascript">
+            function htmlEncode(value) {
+                return $('<div />').text(value).html();
+            }
 
-        //execute on document ready
-        $(function () {
-            //function that the hub can call when it receives a notification.
-            $.connection.notificationHub.client.displayNotification = function (update, alertType) {
-                //Create the bootstrap alert html
-                var jsonUpdate = JSON.parse(update);
-                var alertHtml = '<div class="alert alert-dismissible" role="alert"><button type="button" class="close" data-dismiss="alert"><span>×</span></button><strong>' + htmlEncode(jsonUpdate.price) + '</strong> ' + htmlEncode(htmlEncode(jsonUpdate.user)) + ' ' + htmlEncode(jsonUpdate.price) + '</div>';
-                $(alertHtml)
-                  .hide()                           //hide the newly created element (this is required for fadeIn to work)
-                  .appendTo('#alert-placeholder')   //add it to the palceholder in the page
-                  .fadeIn(500);                     //little flair to grab user attention
-            };
+            //execute on document ready
+            $(function () {
+                //function that the hub can call when it receives a notification.
+                $.connection.notificationHub.client.displayNotification = function (update, alertType) {
+                    //Create the bootstrap alert html
+                    var jsonUpdate = JSON.parse(update);
+                    var alertHtml = '<div class="alert alert-dismissible" role="alert"><button type="button" class="close" data-dismiss="alert"><span>×</span></button><strong>' + htmlEncode(jsonUpdate.price) + '</strong> ' + htmlEncode(htmlEncode(jsonUpdate.user)) + ' ' + htmlEncode(jsonUpdate.price) + '</div>';
+                    $(alertHtml)
+                      .hide()                           //hide the newly created element (this is required for fadeIn to work)
+                      .appendTo('#alert-placeholder')   //add it to the palceholder in the page
+                      .fadeIn(500);                     //little flair to grab user attention
+                };
 
-            window.notifyApp = {
-                hubConnector: $.connection.hub.start()  //start the connection and store object returned globally for access in child views
-            };
+                window.notifyApp = {
+                    hubConnector: $.connection.hub.start()  //start the connection and store object returned globally for access in child views
+                };
 
-        });
-    </script>
-        }
+            });
+        </script>
+    }
 
 </table>
