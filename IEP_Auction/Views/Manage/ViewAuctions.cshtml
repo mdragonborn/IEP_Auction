@@ -11,6 +11,9 @@
 <div id="alert-placeholder"></div>
 
 <h3>Your Auctions</h3>
+<p>
+    @Html.ActionLink("< Back to account settings", "Index", "Manage")
+</p>
 <table class="table">
     <tr>
         <th>
@@ -45,7 +48,7 @@
 
     @if (Model.myAuctions.Count == 0)
     {
-        <tr><h4>You have no auctions</h4></tr>
+        <tr><td colspan="9"><h4>You have no auctions</h4></td></tr>
     }
     else
     {
@@ -137,7 +140,7 @@
 
     @if (Model.biddedAuctions.Count == 0)
     {
-        <tr><h4>You have no auctions</h4></tr>
+        <tr><td colspan="9"><h4>You have no auctions</h4></td></tr>
     }
     else
     {

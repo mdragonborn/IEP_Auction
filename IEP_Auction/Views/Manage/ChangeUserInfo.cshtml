@@ -3,12 +3,15 @@
     ViewBag.Title = "Change User Info";
 }
 
-<h2>@ViewBag.Title.</h2>
+<h2>@ViewBag.Title</h2>
 
 @using (Html.BeginForm("ChangeUserInfo", "Manage", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
 {
     @Html.AntiForgeryToken()
     <h4>Change User Information</h4>
+    <p>
+        @Html.ActionLink("< Back to account settings", "Index", "Manage")
+    </p>
     <hr />
     @Html.ValidationSummary("", new { @class = "text-danger" })
     <div class="form-group">
