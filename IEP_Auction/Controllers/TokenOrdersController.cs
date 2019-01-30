@@ -47,22 +47,27 @@ namespace IEP_Auction.Views
         [Authorize]
         public ActionResult Create(String PurchaseOptions)
         {
-            TokenOrder newOrder = db.TokenOrders.Create();
+            TokenOrder newOrder = new TokenOrder();
             newOrder.Id = Guid.NewGuid();
             newOrder.UserId = User.Identity.GetUserId();
             newOrder.Amount = int.Parse(PurchaseOptions);
+            newOrder.Value = newOrder.Amount;
+            newOrder.Currency = "EUR";
             newOrder.Time = DateTime.Now;
             newOrder.Status = "SUBMITTED";
 
             db.TokenOrders.Add(newOrder);
             db.SaveChanges();
 
-            return RedirectToAction("Index", "TokenOrders");
+
+            return Redirect("https://stage.centili.com/payment/widget?apikey=91063299dc643a1994d0becac101275b&country=rs&clientid=" + newOrder.Id);
         }
-        
-        public JsonResult ConfirmOrder(Guid orderId)
+
+        public JsonResult ConfirmOrder(string clientid, string status)
         {
-            var order = db.TokenOrders.Find(orderId);
+            //var clientid = Guid.Parse(Request["clientid"]);
+            //var status = Guid.Parse(Request["status"]);
+            var order = db.TokenOrders.Find(Guid.Parse(clientid));
             if(order == null)
             {
                 return new JsonResult() { Data = new { status = "Order doesn't exist." }, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
@@ -73,39 +78,27 @@ namespace IEP_Auction.Views
                 return new JsonResult() { Data = new { status = "Order already processed." }, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
             }
 
-            var balance = db.Balances.Find(order.AspNetUser.Id);
-            if(balance == null)
+            if (status.Equals("success"))
             {
-                balance = new Models.Balance();
-                balance.Id = order.AspNetUser.Id;
-                balance.Tokens = 0;
-                db.Balances.Add(balance);
-            }
+                var balance = db.Balances.Find(order.AspNetUser.Id);
+                if (balance == null)
+                {
+                    balance = new Models.Balance();
+                    balance.Id = order.AspNetUser.Id;
+                    balance.Tokens = 0;
+                    db.Balances.Add(balance);
+                }
 
-            balance.Tokens += order.Amount;
-            order.Status = "COMPLETED";
+                balance.Tokens += order.Amount;
+                order.Status = "COMPLETED";
+            }
+            else
+            {
+                order.Status = "CANCELED";
+            }
             db.SaveChanges();
 
             return new JsonResult() { Data = new { status = "Order confirmed." }, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
-        }
-
-        public JsonResult CancelOrder(Guid orderId)
-        {
-            var order = db.TokenOrders.Find(orderId);
-            if (order == null)
-            {
-                return new JsonResult() { Data = new { status = "Order doesn't exist." } , JsonRequestBehavior = JsonRequestBehavior.AllowGet };
-            }
-
-            if (order.Status != "SUBMITTED")
-            {
-                return new JsonResult() { Data = new { status = "Order already processed." } , JsonRequestBehavior = JsonRequestBehavior.AllowGet };
-            }
-
-            order.Status = "CANCELED";
-            db.SaveChanges();
-
-            return new JsonResult() { Data = new { status = "Order canceled." } , JsonRequestBehavior = JsonRequestBehavior.AllowGet };
         }
 
         protected override void Dispose(bool disposing)
