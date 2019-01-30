@@ -81,7 +81,11 @@ namespace IEP_Auction.Views
         // GET: Auctions
         public ActionResult Index(String SearchString, String auctionState, String minPrice, String maxPrice, int? page)
         {
-            int pageSize = PortalParametersController.GetPageSize();
+            int pageSize = PortalParametersController.GetPageSize(db);
+            PortalParameter currency = PortalParametersController.GetCurrency(db);
+            ViewBag.currencyValue = currency.NumValue;
+            ViewBag.currencySymbol = currency.StrValue;
+
             int min = minPrice==null||minPrice==""?0:int.Parse(minPrice);
             int max = maxPrice==null || maxPrice=="" ? 0:int.Parse(maxPrice);
             var predicate = PredicateBuilder.New<Auction>();
@@ -105,7 +109,7 @@ namespace IEP_Auction.Views
             {
                 ViewBag.prevMin = min;
                 ViewBag.prevMax = max;
-                predicate = predicate.And(a => a.Bid.Amount >= min && a.Bid.Amount <= max);
+                predicate = predicate.And(a => a.Bid.Amount * currency.NumValue >= min && a.Bid.Amount * currency.NumValue <= max);
             }
             IQueryable<Auction> auction;
             if (predicate.IsStarted)
