@@ -20,7 +20,9 @@ namespace IEP_Auction.Models
         public virtual DbSet<Balance> Balances { get; set; }
         public virtual DbSet<Bid> Bids { get; set; }
         public virtual DbSet<BidAuction> BidAuctions { get; set; }
+        public virtual DbSet<PortalParameter> PortalParameters { get; set; }
         public virtual DbSet<Reservation> Reservations { get; set; }
+        public virtual DbSet<sysdiagram> sysdiagrams { get; set; }
         public virtual DbSet<TokenOrder> TokenOrders { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)

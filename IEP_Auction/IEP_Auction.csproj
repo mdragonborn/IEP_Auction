@@ -226,11 +226,14 @@
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\IepAuction.cs" />
     <Compile Include="Models\ManageViewModels.cs" />
+    <Compile Include="Models\PortalParameter.cs" />
     <Compile Include="Models\Reservation.cs" />
+    <Compile Include="Models\sysdiagram.cs" />
     <Compile Include="Models\TokenOrder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
     <Compile Include="Controllers\AuctionsController.cs" />
+    <Compile Include="Controllers\PortalParametersController.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap.css" />
@@ -309,6 +312,11 @@
     <Content Include="Views\TokenOrders\Details.cshtml" />
     <Content Include="Views\TokenOrders\Edit.cshtml" />
     <Content Include="Views\TokenOrders\Index.cshtml" />
+    <Content Include="Views\PortalParameters\Create.cshtml" />
+    <Content Include="Views\PortalParameters\Delete.cshtml" />
+    <Content Include="Views\PortalParameters\Details.cshtml" />
+    <Content Include="Views\PortalParameters\Edit.cshtml" />
+    <Content Include="Views\PortalParameters\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

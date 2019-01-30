@@ -1,0 +1,52 @@
+﻿@model IEnumerable<IEP_Auction.Models.PortalParameter>
+
+@{
+    ViewBag.Title = "Admin panel";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Admin panel - Portal parameters</h2>
+
+<p>
+    @Html.ActionLink("Create New", "Create")
+</p>
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.Type)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Name)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.NumValue)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.StrValue)
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.Type)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Name)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.NumValue)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.StrValue)
+        </td>
+        <td>
+            @Html.ActionLink("Edit", "Edit", new { id=item.Name }) |
+            @Html.ActionLink("Details", "Details", new { id=item.Name }) |
+            @Html.ActionLink("Delete", "Delete", new { id=item.Name })
+        </td>
+    </tr>
+}
+
+</table>

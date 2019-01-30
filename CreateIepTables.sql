@@ -2,10 +2,11 @@ USE IepDb;
 
 DROP TABLE IF EXISTS dbo.Balance;
 DROP TABLE IF EXISTS dbo.BidAuction;
-DROP TABLE IF EXISTS dbo.Bid;
 DROP TABLE IF EXISTS dbo.Reservation;
 DROP TABLE IF EXISTS dbo.TokenOrders;
 DROP TABLE IF EXISTS dbo.Auction;
+DROP TABLE IF EXISTS dbo.Bid;
+DROP TABLE IF EXISTS dbo.PortalParameters;
 
 CREATE TABLE dbo.Bid
 (
@@ -58,10 +59,20 @@ CREATE TABLE dbo.Reservation
 CREATE TABLE dbo.TokenOrders
 (
 	Id uniqueidentifier PRIMARY KEY,
-	Status nvarchar(10),
+	Status nvarchar(10) DEFAULT 'SUBMITTED',
 	UserId nvarchar(128) NOT NULL,
 	Amount bigint NOT NULL,
+	Value float NOT NULL,
+	Currency nvarchar(3) NOT NULL,
 	Time datetime NOT NULL,
 	FOREIGN KEY(UserId) REFERENCES dbo.AspNetUsers(Id)
-)
+);
+
+CREATE TABLE dbo.PortalParameters
+(
+	Name nvarchar(128) PRIMARY KEY,
+	Type nvarchar(128),
+	NumValue float,
+	StrValue nvarchar(128),
+);
 

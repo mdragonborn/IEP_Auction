@@ -19,6 +19,12 @@ namespace IEP_Auction.Models
 
         public long Amount { get; set; }
 
+        public double Value { get; set; }
+
+        [Required]
+        [StringLength(3)]
+        public string Currency { get; set; }
+
         public DateTime Time { get; set; }
 
         public virtual AspNetUser AspNetUser { get; set; }
