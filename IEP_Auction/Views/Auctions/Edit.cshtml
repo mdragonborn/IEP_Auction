@@ -11,6 +11,7 @@
         $.post("/Auctions/Start", {guid: id}, function (resultJson) {
             var result = $.parseJSON(resultJson);
             console.log(result);
+            window.location.href = "../details/"+id;
         });
     }
 </script>

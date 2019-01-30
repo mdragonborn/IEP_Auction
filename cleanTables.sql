@@ -1,0 +1,1 @@
+TRUNCATE TABLE dbo.AspNetUserRoles;TRUNCATE TABLE dbo.Reservation;TRUNCATE TABLE dbo.Balance;TRUNCATE TABLE dbo.BidAuction;TRUNCATE TABLE dbo.TokenOrders;DELETE FROM dbo.Auction;DELETE FROM dbo.Bid;TRUNCATE TABLE dbo.AspNetUsers;
