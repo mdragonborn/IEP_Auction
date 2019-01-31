@@ -97,7 +97,16 @@
                 </p>
                 <p>
                     Last bidder:
-                    <span id=@("bidder"+item.Id.ToString().ToLower())>@Html.DisplayFor(modelItem => item.Bid.AspNetUser.Email)</span>
+                    <span id=@("bidder"+item.Id.ToString().ToLower())>
+                        @if (item.Bid.UserId != item.CreatorId)
+                        {
+                            Html.DisplayFor(modelItem => item.Bid.AspNetUser.Email);
+                        }
+                        else
+                        {
+                            <text>None</text>
+                        }
+                    </span>
                 </p>
             </div>
             <div class="auctionControl">
@@ -110,8 +119,8 @@
                 {
                     if (User.IsInRole("Admin") || ViewBag.UserId == (item.CreatorId))
                     {
-                        <text>|</text> @Html.ActionLink("Edit", "Edit", new { id = item.Id }) <text>|</text>
-                        @Html.ActionLink("Delete", "Delete", new { id = item.Id });
+                        <text>|</text> @Html.ActionLink("Edit", "Edit", new { id = item.Id }) 
+                        @*<text>|</text> Html.ActionLink("Delete", "Delete", new { id = item.Id });*@
     }
                 }
             </div>

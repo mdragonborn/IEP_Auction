@@ -9,9 +9,7 @@
     function Start() {
         var id = $('#hiddenModelId').val();
         $.post("/Auctions/Start", {guid: id}, function (resultJson) {
-            var result = $.parseJSON(resultJson);
-            console.log(result);
-            window.location.href = "../details/"+id;
+            window.location.href = "../Details/"+id;
         });
     }
 </script>

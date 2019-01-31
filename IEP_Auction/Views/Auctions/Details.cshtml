@@ -13,9 +13,9 @@
     <div id="alert-placeholder"></div>
     <p>
         @if (User.IsInRole("Admin")) {
-            @Html.ActionLink("Edit", "Edit", new { id = Model.Auction.Id })
+            @Html.ActionLink("Edit", "Edit", new { id = Model.Auction.Id }) <text>|</text>
         }
-        | @Html.ActionLink("Back to List", "Index") | 
+        @Html.ActionLink("Back to List", "Index") | 
         @if (Model.Auction.Status == "OPENED" && Model.Auction.TimeEnd > DateTime.Now) {
             @Html.ActionLink("Bid", "Bid", new { guid = Model.Auction.Id })
         }
@@ -59,7 +59,8 @@
             Current price
         </dt>
         <dd>
-            @Html.DisplayFor(model=>model.Auction.Bid.Amount)
+            @((ViewBag.currencyValue * Model.Auction.Bid.Amount).ToString()) @ViewBag.currencySymbol (@Model.Auction.Bid.Amount Tokens)
+
         </dd>
         @if (Model.Auction.Status == "READY")
         {
@@ -106,10 +107,11 @@
                 <strong>
                 @Html.DisplayFor(bidItem => bid.Bid.AspNetUser.Email)
                 </strong>
-                for amount 
+                for 
                 <strong>
                     @Html.DisplayFor(bidItem => bid.Bid.Amount)
                 </strong>
+                tokens
         </div>
         }
     </div>
@@ -142,9 +144,9 @@
                         + htmlEncode(jsonUpdate.time)
                         + ' : Bid by <strong>'
                         + htmlEncode(jsonUpdate.user)
-                        + '</strong> for amount <strong>'
+                        + '</strong> for <strong>'
                         + htmlEncode(jsonUpdate.price)
-                        + '</strong></div>';
+                        + '</strong> tokens</div>';
                     $(alertHtml)
                       .hide() //hide the newly created element (this is required for fadeIn to work)
                       .prependTo('#bidContainer')   //add it to the palceholder in the page

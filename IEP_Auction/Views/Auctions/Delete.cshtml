@@ -11,6 +11,10 @@
 <div>
     <h4>Auction</h4>
     <hr />
+    @if (ViewBag.ErrMsg != null)
+    {
+    <span class="text-danger">@ViewBag.ErrMsg</span>
+    }
     <dl class="dl-horizontal">
         <dt>
             @Html.DisplayNameFor(model => model.Bid.UserId)

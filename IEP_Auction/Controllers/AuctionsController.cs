@@ -137,6 +137,10 @@ namespace IEP_Auction.Views
         // GET: Auctions/Details/5
         public ActionResult Details(Guid? id)
         {
+            PortalParameter currency = PortalParametersController.GetCurrency(db);
+            ViewBag.currencyValue = currency.NumValue;
+            ViewBag.currencySymbol = currency.StrValue;
+
             var detailsModel = new DetailsModel();
             ViewBag.guid = id;
             if (id == null)
@@ -151,7 +155,7 @@ namespace IEP_Auction.Views
 
             detailsModel.Auction = auction;
             var bids = (from a in db.BidAuctions
-                        where a.AuctionId == id
+                        where a.AuctionId == id && a.Bid.UserId != a.Auction.CreatorId
                         select a);
             bids = bids.OrderByDescending(a => a.Bid.Time);
             detailsModel.Bids = bids.ToList();
@@ -246,6 +250,7 @@ namespace IEP_Auction.Views
         [System.Web.Mvc.Authorize]
         public ActionResult Bid(Guid guid)
         {
+            Auction a = db.Auctions.Find(guid);
             ViewBag.AuctionGuid = guid;
             return View();
         }
@@ -266,6 +271,11 @@ namespace IEP_Auction.Views
                     {
                         ViewBag.ErrMsg = "Auction doesn't exist";
                         transaction.Dispose();
+                        return View(auctionData);
+                    }
+                    if(auction.CreatorId == User.Identity.GetUserId())
+                    {
+                        ViewBag.ErrMsg = "Cannot bid on your own auction.";
                         return View(auctionData);
                     }
                     if (auction.Bid.Amount >= auctionData.TokenAmount)
@@ -347,19 +357,16 @@ namespace IEP_Auction.Views
         }
 
         [HttpPost]
+        [System.Web.Mvc.Authorize(Roles = "Admin")]
         public JsonResult Start(string guid) {
-            if (User.IsInRole("Admin"))
-            {
-                Auction auction = db.Auctions.Find(new Guid(guid));
-                if (auction == null)
-                    return Json(new { status = "WrongGuid" });
-                auction.TimeStart = DateTime.Now;
-                auction.TimeEnd = auction.TimeStart + new TimeSpan(0, auction.DurationMinutes, 0);
-                auction.Status = "OPENED";
-                db.SaveChanges();
-                return Json(new { status = "Success" });
-            }
-            return Json(new { status = "NotAuthorized" });
+            Auction auction = db.Auctions.Find(new Guid(guid));
+            if (auction == null)
+                return Json(new { status = "WrongGuid" });
+            auction.TimeStart = DateTime.Now;
+            auction.TimeEnd = auction.TimeStart + new TimeSpan(0, auction.DurationMinutes, 0);
+            auction.Status = "OPENED";
+            db.SaveChanges();
+            return Json(new { status = "Success" });
         }
 
         // GET: Auctions/Edit/5
@@ -418,6 +425,11 @@ namespace IEP_Auction.Views
         public ActionResult DeleteConfirmed(Guid id)
         {
             Auction auction = db.Auctions.Find(id);
+            if(auction.Status=="OPENED")
+            {
+                ViewBag.ErrMsg = "Cannot delete an auction in progress.";
+                return View(auction);
+            }
             db.Auctions.Remove(auction);
             db.SaveChanges();
             return RedirectToAction("Index");

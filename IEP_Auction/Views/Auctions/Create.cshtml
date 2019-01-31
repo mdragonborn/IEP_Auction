@@ -44,7 +44,7 @@
         </div>
 
         <div class="form-group">
-            @Html.LabelFor(model => model.AuctionLength, htmlAttributes: new { @class = "control-label col-md-2" })
+            @Html.LabelFor(model => model.AuctionLength, htmlAttributes: new { @class = "control-label col-md-2" }) (format hh:mm:ss)
             <div class="col-md-10">
                 @Html.EditorFor(model => model.AuctionLength, new { htmlAttributes = new { @class = "form-control" } })
                 @Html.ValidationMessageFor(model => model.AuctionLength, "", new { @class = "text-danger" })
