@@ -66,12 +66,12 @@
                         <text>00:00:00</text>
                     }
                 </p>
-                <p id=@("amount"+ Model.Auction.Id.ToString().ToLower())>
+                <p id="amount">
                     @((ViewBag.currencyValue * Model.Auction.Bid.Amount).ToString()) @ViewBag.currencySymbol
                 </p>
                 <p>
                     Last bidder:
-                    <span id=@("bidder" + Model.Auction.Id.ToString().ToLower())>
+                    <span id="bidder">
                         @if (Model.Auction.Bid.UserId != Model.Auction.CreatorId)
                         {
                             <span>@Html.DisplayFor(modelItem => Model.Auction.Bid.AspNetUser.Email)</span>
@@ -88,8 +88,9 @@
             </div>
         </div>
   
-        <div id="bidContainer">
+        <div>
             <h3>Bids</h3>
+            <div id="bidContainer">
             @foreach (var bid in Model.Bids)
             {
                 <div class="alert" role="alert" style="margin-bottom:0; padding:5px">
@@ -105,9 +106,12 @@
                     tokens
                 </div>
             }
+                </div>
         </div>
     </div>
         <span id="guid" data="@(ViewBag.guid)" type="hidden"></span>
+    <span id="currencyValue" data="@(ViewBag.currencyValue)" type="hidden"></span>
+    <span id="currencySymbol" data="@(ViewBag.currencySymbol)" type="hidden"></span>
         @section Scripts{
             <script src="~/Scripts/jquery.signalR-2.4.0.js"></script>
             <script src="~/SignalR/Hubs"></script>
@@ -130,6 +134,9 @@
                     $.connection.notificationHub.client.newBid = function (update, alertType) {
                         //Create the bootstrap alert html
                         var jsonUpdate = JSON.parse(update);
+                        document.getElementById("bidder").innerHTML = jsonUpdate.user;
+                        document.getElementById("amount").innerHTML = (jsonUpdate.price*document.getElementById("currencyValue").getAttribute("data")).toString() 
+                            + " " + document.getElementById("currencySymbol").getAttribute("data");
                         var alertHtml = '<div class="alert" role="alert" style="margin-bottom:0; padding:5px">'
                             + htmlEncode(jsonUpdate.time)
                             + ' : Bid by <strong>'
