@@ -12,15 +12,17 @@
         var timeElements = document.getElementsByClassName("times");
         console.log(timeElements);
         for (var el of timeElements) {
-            let timeLeft = Date.parse(el.attributes[2].nodeValue) - new Date()
+            console.log(el.attributes[2].nodeValue);
+            console.log(Date.parse(el.attributes[2].nodeValue));
+            console.log(Date.parse(new Date().toUTCString()));
+            let timeLeft = Date.parse(el.attributes[2].nodeValue) - Date.parse(new Date().toUTCString()) + 3600000;
+            console.log(timeLeft);
             if (timeLeft < 0) continue;
-            let seconds = timeLeft % 60000 / 1000;
-            let secondsStr = parseInt(seconds).toString();
-            if (seconds < 10)
-                secondsStr = "0" + secondsStr;
+
             let element = document.getElementById(el.attributes[1].nodeValue).innerHTML =
-                ((timeLeft/3600000<10)?"0":"") +parseInt(timeLeft / 3600000, 10).toString() + ":" + parseInt((timeLeft % 3600000) / 60000, 10).toString()
-                + ":" + secondsStr;
+                ((timeLeft / 3600000 < 10) ? "0" : "") + parseInt(timeLeft / 3600000, 10).toString() + ":" +
+                 ((timeLeft % 3600000) / 60000 < 10 ? "0" : "") + parseInt((timeLeft % 3600000) / 60000, 10).toString() + ":" +
+                 ((timeLeft % 60000) / 1000 < 10 ? "0" : "") + parseInt(timeLeft % 60000 / 1000).toString();
         }
     }
 
@@ -79,10 +81,14 @@
                 @Html.DisplayFor(modelItem => item.Name)
             </div>
             <div class="auctionDesc">
-                <img src=@Html.DisplayFor(modelItem => item.ImagePath) height="140">
+                @{
+                    var base64 = Convert.ToBase64String(item.ImageFile);
+                    var imgSrc = String.Format("data:image/jpg;base64,{0}", base64);
+                }
+                <img src="@imgSrc" height="140">
                 <p>@Html.DisplayFor(modelItem => item.Status)</p>
                 <p class="times" id=@(item.Id.ToString().ToLower()) 
-                   timeLeft=@(item.TimeEnd.HasValue? item.TimeEnd.Value.ToString("yyyy-MM-dd'T'HH:mm:ss zzz") : "0:0:0")>
+                   timeLeft=@(item.TimeEnd.HasValue? item.TimeEnd.Value.ToString("yyyy-MM-dd'T'HH:mm:ss zzz") :DateTime.Now.ToUniversalTime().ToString("yyyy-MM-dd'T'HH:mm:ss ZZZ"))>
                 @if (item.TimeEnd > DateTime.Now)
                 {
                     @((item.TimeEnd - DateTime.Now).ToString().Split('.')[0])
@@ -100,7 +106,7 @@
                     <span id=@("bidder"+item.Id.ToString().ToLower())>
                         @if (item.Bid.UserId != item.CreatorId)
                         {
-                            Html.DisplayFor(modelItem => item.Bid.AspNetUser.Email);
+                            <span>@Html.DisplayFor(modelItem => item.Bid.AspNetUser.Email)</span>
                         }
                         else
                         {
@@ -111,7 +117,7 @@
             </div>
             <div class="auctionControl">
                 @Html.ActionLink("Details", "Details", new { id = item.Id })
-                @if (item.Status == "OPENED" && item.TimeEnd > DateTime.Now)
+                @if (item.Status == "OPENED" && item.TimeEnd > DateTime.Now.ToUniversalTime())
                 {
                     <text>|</text> @Html.ActionLink("Bid", "Bid", new { guid = item.Id })
                 }

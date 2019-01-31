@@ -4,6 +4,28 @@
     ViewBag.Title = "Details";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
+<link href="~/Content/styles.css" rel="stylesheet" type="text/css" />
+
+<script>
+    function countdown() {
+        var timeElements = document.getElementsByClassName("times");
+        console.log(timeElements);
+        for (var el of timeElements) {
+            console.log(el.attributes[2].nodeValue);
+            console.log(Date.parse(el.attributes[2].nodeValue));
+            console.log(Date.parse(new Date().toUTCString()));
+            let timeLeft = Date.parse(el.attributes[2].nodeValue) - Date.parse(new Date().toUTCString()) + 3600000;
+            console.log(timeLeft);
+            if (timeLeft < 0) continue;
+            let element = document.getElementById(el.attributes[1].nodeValue).innerHTML =
+                     ((timeLeft / 3600000 < 10) ? "0" : "") + parseInt(timeLeft / 3600000, 10).toString() + ":" +
+                      ((timeLeft % 3600000) / 60000 < 10 ? "0" : "") + parseInt((timeLeft % 3600000) / 60000, 10).toString() + ":" +
+                      ((timeLeft % 60000) / 1000 < 10 ? "0" : "") + parseInt(timeLeft % 60000 / 1000).toString();
+        }
+    }
+
+    setInterval(countdown, 1000);
+</script>
 
 <h2>Details</h2>
 
@@ -20,147 +42,115 @@
             @Html.ActionLink("Bid", "Bid", new { guid = Model.Auction.Id })
         }
     </p>
-    <dl class="dl-horizontal">
-                <dt>
-            Item name
-        </dt>
 
-        <dd>
-            @Html.DisplayFor(model => model.Auction.Name)
-        </dd>
-
-        <dt>
-            @Html.DisplayNameFor(model => model.Auction.Description)
-        </dt>
-
-        <dd>
-            @Html.DisplayFor(model => model.Auction.Description)
-        </dd>
-        <dt>
-        </dt>
-        <dd>
-            <img src=@Html.DisplayFor(model => model.Auction.ImagePath) height="100px">
-        </dd>
-        <dt>
-            Auction creator
-        </dt>
-
-        <dd>
-            @Html.DisplayFor(model => model.Auction.AspNetUser.Email)
-        </dd>
-        <dt>
-            Status
-        </dt>
-
-        <dd>
-            @Html.DisplayFor(model => model.Auction.Status)
-        </dd>
-        <dt>
-            Current price
-        </dt>
-        <dd>
-            @((ViewBag.currencyValue * Model.Auction.Bid.Amount).ToString()) @ViewBag.currencySymbol (@Model.Auction.Bid.Amount Tokens)
-
-        </dd>
-        @if (Model.Auction.Status == "READY")
-        {
-            <dt>Auction Length (minutes)</dt>
-            <dd>@Html.DisplayFor(model => model.Auction.DurationMinutes)</dd>
-        }
-        else
-        {
-        <dt>
-            Current bidder
-        </dt>
-                if (Model.Auction.Bid.AspNetUser.Id != Model.Auction.CreatorId)
-                {
-                <dd>@Html.DisplayFor(model => model.Auction.Bid.AspNetUser.Email)</dd>
+    <div class="singleAuctionPage">
+        <div class="auctionItem">
+            <div class="auctionTitle">
+                @Html.DisplayFor(model => model.Auction.Name)
+            </div>
+            <div class="auctionDesc">
+                @{
+                    var base64 = Convert.ToBase64String(Model.Auction.ImageFile);
+                    var imgSrc = String.Format("data:image/jpg;base64,{0}", base64);
                 }
-                else { <dd>None</dd> }
-
-        <dt>
-            Start time
-        </dt>
-
-        <dd>
-            @Html.DisplayFor(model => model.Auction.TimeStart)
-        </dd>
-
-        <dt>
-            End time
-        </dt>
-
-        <dd>
-            @Html.DisplayFor(model => model.Auction.TimeEnd)
-        </dd>
-        }
-
-    </dl>
-
-    <h3>Bids</h3>
-    <div id="bidContainer">
-        @foreach (var bid in Model.Bids)
-        {
-            <div class="alert" role="alert" style="margin-bottom:0; padding:5px">
-                @Html.DisplayFor(bidItem => bid.Bid.Time)
-               : Bid by 
-                <strong>
-                @Html.DisplayFor(bidItem => bid.Bid.AspNetUser.Email)
-                </strong>
-                for 
-                <strong>
-                    @Html.DisplayFor(bidItem => bid.Bid.Amount)
-                </strong>
-                tokens
+                <img src="@imgSrc" height="140">
+                <p>@Html.DisplayFor(model => model.Auction.Status)</p>
+                <p class="times" id=@(Model.Auction.Id.ToString().ToLower())
+                   timeLeft=@(Model.Auction.TimeEnd.HasValue? Model.Auction.TimeEnd.Value.ToString("yyyy-MM-dd'T'HH:mm:ss zzz") :DateTime.Now.ToUniversalTime().ToString("yyyy-MM-dd'T'HH:mm:ss ZZZ"))>
+                    @if (Model.Auction.TimeEnd > DateTime.Now)
+            {
+                        @((Model.Auction.TimeEnd - DateTime.Now).ToString().Split('.')[0])
+                    }
+                    else
+                    {
+                        <text>00:00:00</text>
+                    }
+                </p>
+                <p id=@("amount"+ Model.Auction.Id.ToString().ToLower())>
+                    @((ViewBag.currencyValue * Model.Auction.Bid.Amount).ToString()) @ViewBag.currencySymbol
+                </p>
+                <p>
+                    Last bidder:
+                    <span id=@("bidder" + Model.Auction.Id.ToString().ToLower())>
+                        @if (Model.Auction.Bid.UserId != Model.Auction.CreatorId)
+                        {
+                            <span>@Html.DisplayFor(modelItem => Model.Auction.Bid.AspNetUser.Email)</span>
+                        }
+                        else
+                        {
+                            <text>None</text>
+                        }
+                    </span>
+                </p>
+            </div>
+            <div class="auctionControl">
+                @(Model.Auction.Description)
+            </div>
         </div>
+  
+        <div id="bidContainer">
+            <h3>Bids</h3>
+            @foreach (var bid in Model.Bids)
+            {
+                <div class="alert" role="alert" style="margin-bottom:0; padding:5px">
+                    @Html.DisplayFor(bidItem => bid.Bid.Time)
+                    : Bid by
+                    <strong>
+                        @Html.DisplayFor(bidItem => bid.Bid.AspNetUser.Email)
+                    </strong>
+                    for
+                    <strong>
+                        @Html.DisplayFor(bidItem => bid.Bid.Amount)
+                    </strong>
+                    tokens
+                </div>
+            }
+        </div>
+    </div>
+        <span id="guid" data="@(ViewBag.guid)" type="hidden"></span>
+        @section Scripts{
+            <script src="~/Scripts/jquery.signalR-2.4.0.js"></script>
+            <script src="~/SignalR/Hubs"></script>
+            <script type="text/javascript">
+                function htmlEncode(value) {
+                    return $('<div />').text(value).html();
+                }
+
+                //execute on document ready
+                $(function () {
+                    $.connection.hub.start()
+            .done(function () {
+                console.log('Now connected, connection ID=' + $.connection.hub.id);
+                $.connection.notificationHub.server.joinGroup(document.getElementById("guid").getAttribute("data"));
+            })
+            .fail(function () { console.log('Could not Connect!'); });
+
+
+                    //function that the hub can call when it receives a notification.
+                    $.connection.notificationHub.client.newBid = function (update, alertType) {
+                        //Create the bootstrap alert html
+                        var jsonUpdate = JSON.parse(update);
+                        var alertHtml = '<div class="alert" role="alert" style="margin-bottom:0; padding:5px">'
+                            + htmlEncode(jsonUpdate.time)
+                            + ' : Bid by <strong>'
+                            + htmlEncode(jsonUpdate.user)
+                            + '</strong> for <strong>'
+                            + htmlEncode(jsonUpdate.price)
+                            + '</strong> tokens</div>';
+                        $(alertHtml)
+                          .hide() //hide the newly created element (this is required for fadeIn to work)
+                          .prependTo('#bidContainer')   //add it to the palceholder in the page
+                          .fadeIn(500);                     //little flair to grab user attention
+                    };
+
+                    window.notifyApp = {
+                        hubConnector: $.connection.hub.start()  //start the connection and store object returned globally for access in child views
+                    };
+
+                });
+                $(window).unload(function () {
+                    $.connection.notificationHub.server.removeGroup(document.getElementById("guid").getAttribute("data"));
+                })
+            </script>
         }
     </div>
-
-    <span id="guid" data="@(ViewBag.guid)" type="hidden"></span>
-
-    @section Scripts{
-        <script src="~/Scripts/jquery.signalR-2.4.0.js"></script>
-        <script src="~/SignalR/Hubs"></script>
-        <script type="text/javascript">
-            function htmlEncode(value) {
-                return $('<div />').text(value).html();
-            }
-
-            //execute on document ready
-            $(function () {
-                $.connection.hub.start()
-        .done(function () {
-            console.log('Now connected, connection ID=' + $.connection.hub.id);
-            $.connection.notificationHub.server.joinGroup(document.getElementById("guid").getAttribute("data"));
-        })
-        .fail(function () { console.log('Could not Connect!'); });
-
-
-                //function that the hub can call when it receives a notification.
-                $.connection.notificationHub.client.newBid = function (update, alertType) {
-                    //Create the bootstrap alert html
-                    var jsonUpdate = JSON.parse(update);
-                    var alertHtml = '<div class="alert" role="alert" style="margin-bottom:0; padding:5px">'
-                        + htmlEncode(jsonUpdate.time)
-                        + ' : Bid by <strong>'
-                        + htmlEncode(jsonUpdate.user)
-                        + '</strong> for <strong>'
-                        + htmlEncode(jsonUpdate.price)
-                        + '</strong> tokens</div>';
-                    $(alertHtml)
-                      .hide() //hide the newly created element (this is required for fadeIn to work)
-                      .prependTo('#bidContainer')   //add it to the palceholder in the page
-                      .fadeIn(500);                     //little flair to grab user attention
-                };
-
-                window.notifyApp = {
-                    hubConnector: $.connection.hub.start()  //start the connection and store object returned globally for access in child views
-                };
-
-            });
-            $(window).unload(function () {
-                $.connection.notificationHub.server.removeGroup(document.getElementById("guid").getAttribute("data"));
-            })
-        </script>
-        }
-</div>

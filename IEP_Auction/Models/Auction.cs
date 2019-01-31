@@ -41,9 +41,10 @@ namespace IEP_Auction.Models
         [Required]
         public string Description { get; set; }
 
-        [Required]
         [StringLength(256)]
         public string ImagePath { get; set; }
+
+        public byte[] ImageFile { get; set; }
 
         public virtual AspNetUser AspNetUser { get; set; }
 

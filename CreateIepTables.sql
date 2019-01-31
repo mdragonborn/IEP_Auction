@@ -27,7 +27,8 @@ CREATE TABLE dbo.Auction
 	LastBidId bigint,
 	Name nvarchar(128) NOT NULL,
 	Description text NOT NULL,
-	ImagePath nvarchar(256) NOT NULL,
+	ImagePath nvarchar(256),
+	ImageFile varbinary(max),
 	FOREIGN KEY(CreatorId) REFERENCES dbo.AspNetUsers(Id),
 	FOREIGN KEY(LastBidId) REFERENCES Bid(Id));
 

@@ -183,8 +183,10 @@ namespace IEP_Auction.Views
                 var file = auctionData.File;
                 
                 var id = Guid.NewGuid();
-                var imgPath = "/auctionItems/" + id + file.FileName;
-                file.SaveAs(Server.MapPath("~" + imgPath));
+                byte[] imageFile = new byte[file.ContentLength];
+                file.InputStream.Read(imageFile, 0, file.ContentLength);
+                //var imgPath = id + file.FileName;
+                //file.SaveAs(Server.MapPath("~" + imgPath));
 
                 var auction = new Auction
                 {
@@ -195,7 +197,8 @@ namespace IEP_Auction.Views
                     Status = "READY",
                     Name = auctionData.Name,
                     Description = auctionData.Description,
-                    ImagePath = imgPath
+                    ImagePath = file.FileName,
+                    ImageFile = imageFile
                 };
 
                 var initBid = new Bid
@@ -362,7 +365,7 @@ namespace IEP_Auction.Views
             Auction auction = db.Auctions.Find(new Guid(guid));
             if (auction == null)
                 return Json(new { status = "WrongGuid" });
-            auction.TimeStart = DateTime.Now;
+            auction.TimeStart = DateTime.Now.ToUniversalTime();
             auction.TimeEnd = auction.TimeStart + new TimeSpan(0, auction.DurationMinutes, 0);
             auction.Status = "OPENED";
             db.SaveChanges();

@@ -1,4 +1,9 @@
-﻿.auctionItem {
+﻿.singleAuctionPage {
+    display: grid;
+    grid-template-columns: 250px 1fr;   
+}
+
+.auctionItem {
     display: grid;
     grid-template-rows: 3rem 1fr 3rem;
     border: 2px solid #101010;

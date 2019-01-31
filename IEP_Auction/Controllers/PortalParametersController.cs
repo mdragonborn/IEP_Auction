@@ -32,14 +32,12 @@ namespace IEP_Auction.Views
 
         public static List<PortalParameter> GetType(String type=null, IepAuction db = null)
         {
-            if (parameters == null)
+            if (db == null)
             {
-                if (db == null)
-                {
-                    db = new IepAuction();
-                }
-                LoadParameters(db);
+                db = new IepAuction();
             }
+            LoadParameters(db);
+            
             if(type!=null)
             {
                 return parameters.Where(p => p.Type == type).ToList();
@@ -50,19 +48,22 @@ namespace IEP_Auction.Views
 
         public static int GetPageSize(IepAuction db = null)
         {
-            GetType(null, db);
+            if(pageSize==null)
+                GetType(null, db);
             return pageSize;
         }
 
         public static List<PortalParameter> GetTokenPacks(IepAuction db = null)
         {
-            GetType(null, db);
+            if(tokenPacks==null)
+                GetType(null, db);
             return tokenPacks;
         }
 
         public static PortalParameter GetCurrency(IepAuction db = null)
         {
-            GetType(null, db);
+            if(currency==null)
+                GetType(null, db);
 
             return currency;
         }
