@@ -58,7 +58,7 @@
                 <option value="" @{if (ViewBag.selectedState == "") { <text> selected="selected" </text>   }}>Any</option>
                 <option value="READY" @{if (ViewBag.selectedState == "READY") { <text> selected="selected" </text>   }}>Ready</option>
                 <option value="OPENED" @{if (ViewBag.selectedState == "OPENED") { <text> selected="selected" </text>   }}>Opened</option>
-                <option value="COMPLETED" @{if (ViewBag.selectedState == "COMPLETED") { <text> selected="selected" </text>   }}>Completed</option>
+                <option value="CLOSED" @{if (ViewBag.selectedState == "CLOSED") { <text> selected="selected" </text>   }}>Closed</option>
             </select>
         </p>
         <p>
@@ -92,7 +92,7 @@
                     <text>00:00:00</text>
                 }
                 </p>
-                <p>
+                <p id=@("amount"+item.Id.ToString().ToLower())>
                     @((ViewBag.currencyValue * item.Bid.Amount).ToString()) @ViewBag.currencySymbol
                 </p>
                 <p>
@@ -119,109 +119,10 @@
         </div>
 
     }
+    <span id="currencyValue" data="@(ViewBag.currencyValue)" type="hidden"></span>
+    <span id="currencySymbol" data="@(ViewBag.currencySymbol)" type="hidden"></span>
+
 </div>
-
-
-@*
-<table class="table">
-    <tr>
-        <th>
-            @Html.DisplayNameFor(model => model.Name)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.Description)
-        </th>
-        <th>
-            Image
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.Bid.Amount)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.Status)
-        </th>
-        <th>
-            Time left
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.AspNetUser.Email)
-        </th>
-        <th>
-            Start time
-        </th>
-        <th>
-            End Time
-        </th>
-        <th></th>
-    </tr>
-
-
-
-    @foreach (var item in Model)
-    {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Name)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Description)
-            </td>
-            <td>
-                <img src=@Html.DisplayFor(modelItem => item.ImagePath) height="140">
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Bid.Amount)
-            </td>
-            <td>
-                @if (item.TimeEnd == null & item.TimeEnd <= DateTime.Now)
-                {
-                    <span>CLOSED</span>
-                }
-                else
-                {
-                    @Html.DisplayFor(modelItem => item.Status)
-
-                }
-            </td>
-            <td>
-                @if (item.TimeEnd > DateTime.Now)
-                {
-                    @(item.TimeEnd - DateTime.Now)
-                }
-                else
-                {
-                    @(new TimeSpan(0))
-                }
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.AspNetUser.Email)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.TimeStart)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.TimeEnd)
-            </td>
-            <td>
-                @Html.ActionLink("Details", "Details", new { id = item.Id })<br />
-                @if (item.Status == "OPENED" && item.TimeEnd > DateTime.Now)
-                {
-                    @Html.ActionLink("Bid", "Bid", new { guid = item.Id })<br />
-                }
-                @if (Request.IsAuthenticated)
-
-                {
-                    if (User.IsInRole("Admin") || ViewBag.UserId == (item.CreatorId))
-                    {
-                        @Html.ActionLink("Edit", "Edit", new { id = item.Id });<br />
-                        @Html.ActionLink("Delete", "Delete", new { id = item.Id });
-                    }
-                }
-
-            </td>
-        </tr>
-    }
-    *@
 
     @section Scripts{
         <script src="~/Scripts/jquery.signalR-2.4.0.js"></script>
@@ -237,11 +138,10 @@
                 $.connection.notificationHub.client.displayNotification = function (update, alertType) {
                     //Create the bootstrap alert html
                     var jsonUpdate = JSON.parse(update);
-                    var alertHtml = '<div class="alert alert-dismissible" role="alert"><button type="button" class="close" data-dismiss="alert"><span>×</span></button><strong>' + htmlEncode(jsonUpdate.price) + '</strong> ' + htmlEncode(htmlEncode(jsonUpdate.user)) + ' ' + htmlEncode(jsonUpdate.price) + '</div>';
-                    $(alertHtml)
-                      .hide()                           //hide the newly created element (this is required for fadeIn to work)
-                      .appendTo('#alert-placeholder')   //add it to the palceholder in the page
-                      .fadeIn(500);                     //little flair to grab user attention
+                    var amountEl = document.getElementById("amount" + jsonUpdate.auction);
+                    var bidderEl = document.getElementById("bidder" + jsonUpdate.auction);
+                    amountEl.innerHTML = (Math.round(document.getElementById("currencyValue").getAttribute("data") * jsonUpdate.price * 100)/100).toString() + " " + document.getElementById("currencySymbol").getAttribute("data");
+                    bidderEl.innerHTML = jsonUpdate.user;
                 };
 
                 window.notifyApp = {

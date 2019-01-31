@@ -330,7 +330,7 @@ namespace IEP_Auction.Views
                     try
                     {
                         transaction.Commit();
-                        notificationContext.NotifyAll(new { auction = auction.Id, price = bid.Amount, user = userId }, "NewBid");
+                        notificationContext.NotifyAll(new { auction = auction.Id, price = bid.Amount, user = currentUser.Email }, "NewBid");
                         notificationContext.NewBid(auction.Id.ToString(), new { price = bid.Amount, user = currentUser.Email, time = bid.Time.ToString() });
                     }
                     catch (Exception e)
