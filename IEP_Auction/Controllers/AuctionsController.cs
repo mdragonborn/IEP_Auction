@@ -25,11 +25,12 @@ namespace IEP_Auction.Views
 
         protected override void OnActionExecuting(ActionExecutingContext filterContext)
         {
-            var time = DateTime.Now;
+            var time = DateTime.Now.ToUniversalTime();
             Mutex updateCheck = new Mutex(false, "Global/Update");
             try
             {
                 updateCheck.WaitOne();
+
                 if (time - lastUpdate < TimeSpan.FromSeconds(1))
                     return;
                 lastUpdate = time;
@@ -48,6 +49,9 @@ namespace IEP_Auction.Views
                     foreach(Auction auction in finishedAuctions)
                     {
                         auction.Status = "CLOSED";
+                        notificationContext.NewBid(auction.Id.ToString(), new { status="CLOSED" }, "statuschange");
+                        notificationContext.NotifyAll(new { auction = auction.Id, status = "CLOSED" }, "statuschange");
+
                         if (auction.Bid != null && auction.Bid.AspNetUser != auction.AspNetUser)
                         {
                             long amount = (long)auction.Bid.Reservations.ElementAt(0).Amount;
@@ -344,7 +348,7 @@ namespace IEP_Auction.Views
                     {
                         transaction.Commit();
                         notificationContext.NotifyAll(new { auction = auction.Id, price = bid.Amount, user = currentUser.Email }, "NewBid");
-                        notificationContext.NewBid(auction.Id.ToString(), new { price = bid.Amount, user = currentUser.Email, time = bid.Time.ToString() });
+                        notificationContext.NewBid(auction.Id.ToString(), new { price = bid.Amount, user = currentUser.Email, time = bid.Time.ToString() }, "newbid");
                     }
                     catch (Exception e)
                     {
@@ -365,10 +369,28 @@ namespace IEP_Auction.Views
             Auction auction = db.Auctions.Find(new Guid(guid));
             if (auction == null)
                 return Json(new { status = "WrongGuid" });
-            auction.TimeStart = DateTime.Now.ToUniversalTime();
-            auction.TimeEnd = auction.TimeStart + new TimeSpan(0, auction.DurationMinutes, 0);
-            auction.Status = "OPENED";
-            db.SaveChanges();
+            using (var transaction = db.Database.BeginTransaction())
+            {
+                auction.TimeStart = DateTime.Now.ToUniversalTime();
+                auction.TimeEnd = auction.TimeStart + new TimeSpan(0, auction.DurationMinutes, 0);
+                auction.Status = "OPENED";
+
+                notificationContext.NewBid(auction.Id.ToString(), new { status = "OPENED", time = auction.TimeEnd.Value.ToString("yyyy-MM-dd'T'HH:mm:ss") }, "statuschange");
+                notificationContext.NotifyAll(new { auction = auction.Id, status = "OPENED", time = auction.TimeEnd.Value.ToString("yyyy-MM-dd'T'HH:mm:ss") }, "statuschange");
+
+                db.SaveChanges();
+
+                try
+                {
+                    transaction.Commit();
+                }
+                catch (Exception e)
+                {
+                    transaction.Rollback();
+                    ViewBag.ErrMsg = "Error. Please try again.";
+                    return Json(new { status = "Error" });
+                }
+            }
             return Json(new { status = "Success" });
         }
 

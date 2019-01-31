@@ -98,7 +98,7 @@ namespace IEP_Auction.Views
             }
             db.SaveChanges();
 
-            return new JsonResult() { Data = new { status = "Order confirmed." }, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
+            return new JsonResult() { Data = new { status  ="Order confirmed." }, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
         }
 
         protected override void Dispose(bool disposing)

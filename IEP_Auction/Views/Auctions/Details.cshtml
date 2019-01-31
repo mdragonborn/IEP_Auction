@@ -54,7 +54,7 @@
                     var imgSrc = String.Format("data:image/jpg;base64,{0}", base64);
                 }
                 <img src="@imgSrc" height="140">
-                <p>@Html.DisplayFor(model => model.Auction.Status)</p>
+                <p id="status">@Html.DisplayFor(model => model.Auction.Status)</p>
                 <p class="times" id=@(Model.Auction.Id.ToString().ToLower())
                    timeLeft=@(Model.Auction.TimeEnd.HasValue? Model.Auction.TimeEnd.Value.ToString("yyyy-MM-dd'T'HH:mm:ss zzz") :DateTime.Now.ToUniversalTime().ToString("yyyy-MM-dd'T'HH:mm:ss ZZZ"))>
                     @if (Model.Auction.TimeEnd > DateTime.Now)
@@ -132,22 +132,30 @@
 
                     //function that the hub can call when it receives a notification.
                     $.connection.notificationHub.client.newBid = function (update, alertType) {
-                        //Create the bootstrap alert html
-                        var jsonUpdate = JSON.parse(update);
-                        document.getElementById("bidder").innerHTML = jsonUpdate.user;
-                        document.getElementById("amount").innerHTML = (jsonUpdate.price*document.getElementById("currencyValue").getAttribute("data")).toString() 
-                            + " " + document.getElementById("currencySymbol").getAttribute("data");
-                        var alertHtml = '<div class="alert" role="alert" style="margin-bottom:0; padding:5px">'
-                            + htmlEncode(jsonUpdate.time)
-                            + ' : Bid by <strong>'
-                            + htmlEncode(jsonUpdate.user)
-                            + '</strong> for <strong>'
-                            + htmlEncode(jsonUpdate.price)
-                            + '</strong> tokens</div>';
-                        $(alertHtml)
-                          .hide() //hide the newly created element (this is required for fadeIn to work)
-                          .prependTo('#bidContainer')   //add it to the palceholder in the page
-                          .fadeIn(500);                     //little flair to grab user attention
+                        if (alertType == "newbid") {
+                            //Create the bootstrap alert html
+                            var jsonUpdate = JSON.parse(update);
+                            document.getElementById("bidder").innerHTML = jsonUpdate.user;
+                            document.getElementById("amount").innerHTML = (jsonUpdate.price * document.getElementById("currencyValue").getAttribute("data")).toString()
+                                + " " + document.getElementById("currencySymbol").getAttribute("data");
+                            var alertHtml = '<div class="alert" role="alert" style="margin-bottom:0; padding:5px">'
+                                + htmlEncode(jsonUpdate.time)
+                                + ' : Bid by <strong>'
+                                + htmlEncode(jsonUpdate.user)
+                                + '</strong> for <strong>'
+                                + htmlEncode(jsonUpdate.price)
+                                + '</strong> tokens</div>';
+                            $(alertHtml)
+                              .hide()
+                              .prependTo('#bidContainer')
+                              .fadeIn(500);
+                        }
+                        if (alertType == "statuschange") {
+                            var jsonUpdate = JSON.parse(update);
+                            document.getElementById("status").innerHTML = jsonUpdate.status;
+                            if (jsonUpdate.status == "OPENED")
+                                document.getElementById("timeLeft").setAttribute("timeLeft", jsonUpdate.time);
+                        }
                     };
 
                     window.notifyApp = {

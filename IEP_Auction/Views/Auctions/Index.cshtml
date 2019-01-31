@@ -86,8 +86,8 @@
                     var imgSrc = String.Format("data:image/jpg;base64,{0}", base64);
                 }
                 <img src="@imgSrc" height="140">
-                <p>@Html.DisplayFor(modelItem => item.Status)</p>
-                <p class="times" id=@(item.Id.ToString().ToLower()) 
+                <p id=@("status"+item.Id.ToString())>@Html.DisplayFor(modelItem => item.Status)</p>
+                <p class="times" id=@("time"+item.Id.ToString().ToLower()) 
                    timeLeft=@(item.TimeEnd.HasValue? item.TimeEnd.Value.ToString("yyyy-MM-dd'T'HH:mm:ss zzz") :DateTime.Now.ToUniversalTime().ToString("yyyy-MM-dd'T'HH:mm:ss ZZZ"))>
                 @if (item.TimeEnd > DateTime.Now)
                 {
@@ -151,12 +151,22 @@
             $(function () {
                 //function that the hub can call when it receives a notification.
                 $.connection.notificationHub.client.displayNotification = function (update, alertType) {
-                    //Create the bootstrap alert html
-                    var jsonUpdate = JSON.parse(update);
-                    var amountEl = document.getElementById("amount" + jsonUpdate.auction);
-                    var bidderEl = document.getElementById("bidder" + jsonUpdate.auction);
-                    amountEl.innerHTML = (Math.round(document.getElementById("currencyValue").getAttribute("data") * jsonUpdate.price * 100)/100).toString() + " " + document.getElementById("currencySymbol").getAttribute("data");
-                    bidderEl.innerHTML = jsonUpdate.user;
+                    console.log(update);
+                    console.log(alertType);
+                    if (alertType == "NewBid") {
+                        var jsonUpdate = JSON.parse(update);
+                        var amountEl = document.getElementById("amount" + jsonUpdate.auction);
+                        var bidderEl = document.getElementById("bidder" + jsonUpdate.auction);
+                        amountEl.innerHTML = (Math.round(document.getElementById("currencyValue").getAttribute("data") * jsonUpdate.price * 100) / 100).toString() + " " + document.getElementById("currencySymbol").getAttribute("data");
+                        bidderEl.innerHTML = jsonUpdate.user;
+                    }
+                    if (alertType == "statuschange") {
+                        var jsonUpdate = JSON.parse(update);
+                        document.getElementById("status"+jsonUpdate.auction).innerHTML = jsonUpdate.status;
+                        if (jsonUpdate.status == "OPENED")
+                            document.getElementById("time" + jsonUpdate.auction).setAttribute("timeLeft", jsonUpdate.time);
+
+                    }
                 };
 
                 window.notifyApp = {

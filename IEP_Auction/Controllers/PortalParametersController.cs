@@ -7,6 +7,7 @@ using System.Net;
 using System.Web;
 using System.Web.Mvc;
 using IEP_Auction.Models;
+using System.Threading;
 
 namespace IEP_Auction.Views
 {
@@ -48,22 +49,41 @@ namespace IEP_Auction.Views
 
         public static int GetPageSize(IepAuction db = null)
         {
-            if(pageSize==null)
-                GetType(null, db);
+            Mutex updateCheck = new Mutex(false, "Global/Params");
+            if (pageSize == 0) try
+            {
+                updateCheck.WaitOne();
+                if (pageSize == 0)
+                    GetType(null, db);
+            } finally { updateCheck.ReleaseMutex(); }
+            
             return pageSize;
         }
 
         public static List<PortalParameter> GetTokenPacks(IepAuction db = null)
         {
-            if(tokenPacks==null)
-                GetType(null, db);
+            Mutex updateCheck = new Mutex(false, "Global/Params");
+            if (tokenPacks == null)  try
+            {
+                updateCheck.WaitOne();
+                if (tokenPacks==null)
+                    GetType(null, db);
+            }
+            finally { updateCheck.ReleaseMutex(); }
+
             return tokenPacks;
         }
 
         public static PortalParameter GetCurrency(IepAuction db = null)
         {
-            if(currency==null)
-                GetType(null, db);
+            Mutex updateCheck = new Mutex(false, "Global/Params");
+            if (currency == null)  try
+            {
+                updateCheck.WaitOne();
+                if (currency==null)
+                    GetType(null, db);
+            }
+            finally { updateCheck.ReleaseMutex(); }
 
             return currency;
         }
