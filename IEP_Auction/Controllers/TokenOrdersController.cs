@@ -30,9 +30,13 @@ namespace IEP_Auction.Views
         {
             ViewBag.UserId = new SelectList(db.AspNetUsers, "Id", "FirstName");
             List<SelectListItem> items = new List<SelectListItem>();
-            items.Add(new SelectListItem() { Text = "Silver - 10 tokens", Value = "10" });
-            items.Add(new SelectListItem() { Text = "Gold - 50 tokens", Value = "50" });
-            items.Add(new SelectListItem() { Text = "Platinum - 100 tokens", Value = "100" });
+            List<PortalParameter> options = PortalParametersController.GetTokenPacks(db);
+            options.Sort((a, b) => a.NumValue > b.NumValue?1:-1);
+            foreach (var option in options)
+                items.Add(new SelectListItem() {
+                    Text = option.Name + " - " + option.StrValue + " tokens",
+                    Value = option.StrValue
+                });
 
             ViewBag.PurchaseOptions = items;
 
