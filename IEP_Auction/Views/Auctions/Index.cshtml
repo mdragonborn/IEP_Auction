@@ -9,14 +9,22 @@
 <script type="text/javascript">
 
     function countdown() {
-        seconds = document.getElementById("timerLabel").innerHTML;
-        if (seconds > 0) {
-            document.getElementById("timerLabel").innerHTML = seconds - 1;
-            setTimeout("countdown()", 1000);
+        var timeElements = document.getElementsByClassName("times");
+        console.log(timeElements);
+        for (var el of timeElements) {
+            let timeLeft = Date.parse(el.attributes[2].nodeValue) - new Date()
+            if (timeLeft < 0) continue;
+            let seconds = timeLeft % 60000 / 1000;
+            let secondsStr = parseInt(seconds).toString();
+            if (seconds < 10)
+                secondsStr = "0" + secondsStr;
+            let element = document.getElementById(el.attributes[1].nodeValue).innerHTML =
+                ((timeLeft/3600000<10)?"0":"") +parseInt(timeLeft / 3600000, 10).toString() + ":" + parseInt((timeLeft % 3600000) / 60000, 10).toString()
+                + ":" + secondsStr;
         }
     }
 
-    setTimeout("countdown()", 1000);
+    setInterval(countdown, 1000);
 
 </script>
 
@@ -73,21 +81,24 @@
             <div class="auctionDesc">
                 <img src=@Html.DisplayFor(modelItem => item.ImagePath) height="140">
                 <p>@Html.DisplayFor(modelItem => item.Status)</p>
-                <p>@if (item.TimeEnd > DateTime.Now)
+                <p class="times" id=@(item.Id.ToString().ToLower()) 
+                   timeLeft=@(item.TimeEnd.HasValue? item.TimeEnd.Value.ToString("yyyy-MM-dd'T'HH:mm:ss zzz") : "0:0:0")>
+                @if (item.TimeEnd > DateTime.Now)
                 {
-                    @(item.TimeEnd - DateTime.Now)
+                    @((item.TimeEnd - DateTime.Now).ToString().Split('.')[0])
                 }
                 else
                 {
-                    @(new TimeSpan(0))
+                    <text>00:00:00</text>
                 }
-                    </p>
+                </p>
                 <p>
-                @((ViewBag.currencyValue * item.Bid.Amount).ToString()) @ViewBag.currencySymbol
-                    </p>
+                    @((ViewBag.currencyValue * item.Bid.Amount).ToString()) @ViewBag.currencySymbol
+                </p>
                 <p>
-                Last bidder:
-                @Html.DisplayFor(modelItem => item.Bid.AspNetUser.Email)</p>
+                    Last bidder:
+                    <span id=@("bidder"+item.Id.ToString().ToLower())>@Html.DisplayFor(modelItem => item.Bid.AspNetUser.Email)</span>
+                </p>
             </div>
             <div class="auctionControl">
                 @Html.ActionLink("Details", "Details", new { id = item.Id })
