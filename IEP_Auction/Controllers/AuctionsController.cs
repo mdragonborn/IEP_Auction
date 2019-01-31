@@ -259,7 +259,17 @@ namespace IEP_Auction.Views
         {
             Auction a = db.Auctions.Find(guid);
             ViewBag.AuctionGuid = guid;
-            return View();
+            if (a == null)
+            {
+                ViewBag.ErrMsg = "Auction doesn't exist.";
+                return View();
+            }
+            CreateBidModel model = new CreateBidModel()
+            {
+                AuctionGuid = guid,
+                TokenAmount = a.Bid.Amount.Value + 1
+            };
+            return View(model);
         }
 
         [HttpPost]
