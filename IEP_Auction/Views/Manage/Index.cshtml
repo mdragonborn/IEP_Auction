@@ -14,6 +14,8 @@
         <dd>@Model.Email</dd>
         <dt>Name:</dt>
         <dd>@Model.FirstName @Model.LastName</dd>
+        <dt>Token balance:</dt>
+        <dd>@Model.TokenBalance</dd>
         <dd>@Html.ActionLink("Change your email or name", "ChangeUserInfo")</dd>
         <dd>@Html.ActionLink("Change your password", "ChangePassword")</dd>
         <dd>@Html.ActionLink("View token orders", "Index", "TokenOrders")</dd>

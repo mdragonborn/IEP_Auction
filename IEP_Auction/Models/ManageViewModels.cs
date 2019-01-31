@@ -10,6 +10,7 @@ namespace IEP_Auction.Models
         public string Email { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
+        public long TokenBalance { get; set; }
     }
 
     public class ManageLoginsViewModel

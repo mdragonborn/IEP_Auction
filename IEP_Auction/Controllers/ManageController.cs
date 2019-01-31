@@ -65,13 +65,14 @@ namespace IEP_Auction.Controllers
                 : "";
 
             var userId = User.Identity.GetUserId();
-            var user = UserManager.FindById(userId);
+            var user = db.AspNetUsers.Find(userId);
+            var balance = user.Balance!=null?(user.Balance.Tokens.HasValue ? user.Balance.Tokens.Value : 0):0;
             var model = new IndexViewModel
             {
-                Email = await UserManager.GetEmailAsync(userId),
+                Email = user.Email,
                 FirstName = user.FirstName,
-                LastName = user.LastName
-                // TODO view tokens
+                LastName = user.LastName,
+                TokenBalance = balance
             };
             return View(model);
         }
