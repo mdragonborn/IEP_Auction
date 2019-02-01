@@ -9,11 +9,11 @@
 <script>
     function countdown() {
         var timeElements = document.getElementsByClassName("times");
-        console.log(timeElements);
+        //console.log(timeElements);
         for (var el of timeElements) {
-            console.log(el.attributes[2].nodeValue);
-            console.log(Date.parse(el.attributes[2].nodeValue));
-            console.log(Date.parse(new Date().toUTCString()));
+            //console.log(el.attributes[2].nodeValue);
+            //console.log(Date.parse(el.attributes[2].nodeValue));
+            //console.log(Date.parse(new Date().toUTCString()));
             let timeLeft = Date.parse(el.attributes[2].nodeValue) - Date.parse(new Date().toUTCString()) + 3600000;
             console.log(timeLeft);
             if (timeLeft < 0) continue;
