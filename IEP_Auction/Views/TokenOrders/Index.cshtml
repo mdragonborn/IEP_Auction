@@ -13,6 +13,10 @@
 <p>
     @Html.ActionLink("Buy Tokens", "Create")
 </p>
+@if (ViewBag.ErrMsg != null)
+{
+    <span color="red">@ViewBag.ErrMsg</span>
+}
 <table class="table">
     <tr>
         <th>

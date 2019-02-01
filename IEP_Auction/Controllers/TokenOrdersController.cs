@@ -64,22 +64,23 @@ namespace IEP_Auction.Views
             db.SaveChanges();
 
 
-            return Redirect("https://stage.centili.com/payment/widget?apikey=91063299dc643a1994d0becac101275b&country=rs&clientid=" + newOrder.Id);
+            return Redirect("https://stage.centili.com/payment/widget?apikey=91063299dc643a1994d0becac101275b&country=rs&userid=" + newOrder.Id);
         }
 
-        public JsonResult ConfirmOrder(string clientid, string status)
+        public ActionResult ConfirmOrder(string userid, string status)
         {
-            //var clientid = Guid.Parse(Request["clientid"]);
-            //var status = Guid.Parse(Request["status"]);
-            var order = db.TokenOrders.Find(Guid.Parse(clientid));
+            //return new JsonResult() { Data = new { id = Request.QueryString.ToString()}, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
+            var order = db.TokenOrders.Find(Guid.Parse(userid));
             if(order == null)
             {
-                return new JsonResult() { Data = new { status = "Order doesn't exist." }, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
+                ViewBag.ErrMsg = "Order doesn't exist";
+                return RedirectToAction("Index", "TokenOrders");
             }
 
             if(order.Status != "SUBMITTED")
             {
-                return new JsonResult() { Data = new { status = "Order already processed." }, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
+                ViewBag.ErrMsg = "Order already processed";
+                return RedirectToAction("Index", "TokenOrders");
             }
 
             if (status.Equals("success"))
@@ -94,15 +95,17 @@ namespace IEP_Auction.Views
                 }
 
                 balance.Tokens += order.Amount;
+                ViewBag.ErrMsg = "Order confirmed.";
                 order.Status = "COMPLETED";
             }
             else
             {
+                ViewBag.ErrMsg = "Order failed.";
                 order.Status = "CANCELED";
             }
             db.SaveChanges();
 
-            return new JsonResult() { Data = new { status  ="Order confirmed." }, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
+            return RedirectToAction("Index", "TokenOrders");
         }
 
         protected override void Dispose(bool disposing)
