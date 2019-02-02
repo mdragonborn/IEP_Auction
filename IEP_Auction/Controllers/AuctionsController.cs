@@ -122,13 +122,15 @@ namespace IEP_Auction.Views
                 auction = db.Auctions;
             if (auction.Count() > 0)
             {
-                ViewBag.pageCount = (auction.Count() / pageSize)>0? auction.Count() / pageSize:1;
+                ViewBag.pageCount = ((auction.Count()+pageSize-1) / pageSize)>0? (auction.Count() + pageSize - 1) / pageSize:1;
                 if (page == null || page <= 0) page = 1;
                 if (page > ViewBag.pageCount) page = ViewBag.pageCount;
                 ViewBag.pageNumber = page;
                 if (auction.Count() < pageSize)
                     pageSize = auction.Count();
-                return View(auction.ToList().GetRange(pageSize * ((int)page - 1), pageSize));
+                int limit = auction.Count() - (pageSize * ((int)page - 1));
+                if (limit > pageSize) limit = pageSize;
+                return View(auction.ToList().GetRange(pageSize * ((int)page - 1), limit));
             }
             else
             {

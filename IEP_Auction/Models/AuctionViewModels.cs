@@ -48,6 +48,7 @@ namespace IEP_Auction.Models
 
         [Required]
         [Display(Name = "Initial price")]
+        [Range(1, int.MaxValue)]
         public int InitialPrice { get; set; }
 
         [Required]

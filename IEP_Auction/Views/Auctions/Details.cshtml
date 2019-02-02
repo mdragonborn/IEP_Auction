@@ -43,7 +43,7 @@
         }
     </p>
 
-    <div class="singleAuctionPage">
+    <div class="singleAuctionPage" style="grid-template-columns: 1fr 4fr;">
         <div class="auctionItem">
             <div class="auctionTitle">
                 @Html.DisplayFor(model => model.Auction.Name)
@@ -55,7 +55,7 @@
                 }
                 <img src="@imgSrc" height="140">
                 <p id="status">@Html.DisplayFor(model => model.Auction.Status)</p>
-                <p class="times" id=@(Model.Auction.Id.ToString().ToLower())
+                <p class="times" id="timeLeft"
                    timeLeft=@(Model.Auction.TimeEnd.HasValue? Model.Auction.TimeEnd.Value.ToString("yyyy-MM-dd'T'HH:mm:ss zzz") :DateTime.Now.ToUniversalTime().ToString("yyyy-MM-dd'T'HH:mm:ss ZZZ"))>
                     @if (Model.Auction.TimeEnd > DateTime.Now)
             {
