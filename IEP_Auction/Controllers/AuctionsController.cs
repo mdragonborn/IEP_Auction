@@ -26,7 +26,7 @@ namespace IEP_Auction.Views
         protected override void OnActionExecuting(ActionExecutingContext filterContext)
         {
             var time = DateTime.Now.ToUniversalTime();
-            Mutex updateCheck = new Mutex(false, "Global/Update");
+            Mutex updateCheck = new Mutex(false, "Global\\Update");
             try
             {
                 updateCheck.WaitOne();
