@@ -26,8 +26,31 @@ namespace IEP_Auction.Views
                           select p);
 
             currency = parameters.Where(p => p.Type == "Currency").First();
-            tokenPacks = parameters.Where(p => p.Type == "TokenPack").ToList();
+            tokenPacks = parameters.Where(p => p.Type == "TokenPack").OrderBy(p => p.NumValue).ToList();
             pageSize = (int)parameters.Where(p => p.Type == "PageSize").First().NumValue;
+
+            if (pageSize < 1)
+                pageSize = 9;
+            if (currency.NumValue <= 0)
+                currency.NumValue = 1;
+            if (tokenPacks.Count() == 0)
+            {
+                tokenPacks.Add(new PortalParameter() { Type = "TokenPack", NumValue = 10, Name = "Silver", StrValue = "10" });
+                tokenPacks.Add(new PortalParameter() { Type = "TokenPack", NumValue = 50, Name = "Gold", StrValue = "50" });
+                tokenPacks.Add(new PortalParameter() { Type = "TokenPack", NumValue = 100, Name = "Platinum", StrValue = "100" });
+            }
+            else {
+                foreach(var pack in tokenPacks)
+                {
+                    if (pack.NumValue <= 0)
+                    {
+                        pack.NumValue = 1;
+                        pack.StrValue = "1";
+                    }
+                }
+            }
+
+
             return parameters;
         }
 
